@@ -1,3 +1,0 @@
-keyinputbox {
-    -moz-binding: url("chrome://executejs/content/bindings.xml#keyinputbox") !important;
-}
