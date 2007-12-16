@@ -25,6 +25,11 @@ var EJS_jsCodeField = null;
 var EJS_openWinMenuList = null;
 var EJS_allOpenWins = new Object();
 
+//Form elements
+var EJS_cntTargetWinML = null;
+var EJS_cntConentWinCB = null;
+var EJS_bcContentWin = null;
+
 var EJS_shortcuts = {
     cw: "getBrowser().contentWindow",
     contentWin: "getBrowser().contentWindow",
@@ -35,14 +40,18 @@ var EJS_shortcuts = {
     props: "EJS_printPropertiesForTarget"
 }
 
-function EJS_doOnload(){
-    initGlobVars();
-    initShortCuts();
-    document.getElementById("jsCode").select();
-    //window.addEventListener("unload", EJS_updateWindowSizes, true)
+function EJS_byId(id){
+	return document.getElementById(id);
 }
 
-function initShortCuts(){
+function EJS_doOnload(){
+    EJS_initGlobVars();
+    EJS_initShortCuts();
+    EJS_initFormReferences();
+    document.getElementById("jsCode").select();
+}
+
+function EJS_initShortCuts(){
 	ShortCutManager.addJsShortCutForElement("jsCode", 13, ShortCutManager.CTRL, "EJS_executeJS()");
 	ShortCutManager.addJsShortCutForElement("jsCode", 40, ShortCutManager.CTRL, "EJS_nextCommandFromHistory()");
 	ShortCutManager.addJsShortCutForElement("jsCode", 38, ShortCutManager.CTRL, "EJS_previousCommandFromHistory()");
@@ -51,7 +60,7 @@ function initShortCuts(){
 	
 }
 
-function initGlobVars(){
+function EJS_initGlobVars(){
 	EJS_jsCodeField = document.getElementById("jsCode");
 	EJS_openWinMenuList = document.getElementById("destObj")
 	EJS_openWinMenuList.selectedIndex = 1;
@@ -60,13 +69,44 @@ function initGlobVars(){
 	EJS_currentTarget = wm.getEnumerator(null).getNext();
 }
 
+function EJS_initFormReferences(){
+	EJS_cntTargetWinML = EJS_byId("destObj")
+	EJS_cntConentWinCB = EJS_byId("contentWin")
+	EJS_bcContentWin = EJS_byId("bc_contentWin")
+}
 
-function EJS_setTarget(menuitem){
+function EJS_targetChanged(menuitem){
+	//Set current target
+  	var selectedWin = EJS_getSelectedWin();
+  	
+  	if (selectedWin.getBrowser!=null){
+	  	//Disable/Enable Function checkbox
+  		 EJS_bcContentWin.setAttribute("disabled","false")
+  	}else{
+  		 EJS_bcContentWin.setAttribute("disabled","true")
+  	}
+  	EJS_setCurrentTarget();
+}
+
+function EJS_setCurrentTarget(){
+	var selectedWin = EJS_getSelectedWin();
+	if (selectedWin.getBrowser!=null &&
+		EJS_cntConentWinCB.disabled==false &&
+		EJS_cntConentWinCB.checked==true){
+		EJS_currentTarget = selectedWin.getBrowser().contentWindow.wrappedJSObject;
+	}else {
+		EJS_currentTarget = selectedWin;
+	}
+	Components.utils.reportError("EJS_setCurrentTarget(): " + EJS_currentTarget.title);
+}
+
+function EJS_getSelectedWin(){
 	var mediator = Components.classes["@mozilla.org/rdf/datasource;1?name=window-mediator"].getService();
   	mediator.QueryInterface(Components.interfaces.nsIWindowDataSource);
 
-  	var resource = menuitem.getAttribute('id');
-  	EJS_currentTarget = mediator.getWindowForResource(resource);
+  	var resource = EJS_cntTargetWinML.selectedItem.getAttribute('id')
+  	return mediator.getWindowForResource(resource);
+	
 }
 
 function EJS_executeJS(){
@@ -222,15 +262,9 @@ function EJS_searchFunctions(){
 	}
 }
 
-//Update size and pos before persisting
-//as FF does not store right pos in case window is 
-//maximized
-function EJS_updateWindowSizes(){
-    var win = window.document.documentElement;
-    var winBox = win.boxObject
-    win.width=winBox.width
-    win.height=winBox.height
-    win.screenX=winBox.screenX
-    win.screenY=winBox.screenY
- 
+//Reopen win for debug purposes
+function EJS_ReopenWin(){
+	window.close()
+	window.opener.open("chrome://executejs/content/executeJS.xul","commandwin", "chrome,width=850,height=450,resizable");
 }
+
