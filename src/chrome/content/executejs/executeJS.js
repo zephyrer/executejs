@@ -28,6 +28,8 @@ var EJS_allOpenWins = new Object();
 //Form elements
 var EJS_cntTargetWinML = null;
 var EJS_cntConentWinCB = null;
+var EJS_cntJsCode = null;
+var EJS_pupCodeCompleation = null;
 var EJS_bcContentWin = null;
 
 var EJS_shortcuts = {
@@ -52,12 +54,11 @@ function EJS_doOnload(){
 }
 
 function EJS_initShortCuts(){
-	ShortCutManager.addJsShortCutForElement("jsCode", 13, ShortCutManager.CTRL, "EJS_executeJS()");
-	ShortCutManager.addJsShortCutForElement("jsCode", 40, ShortCutManager.CTRL, "EJS_nextCommandFromHistory()");
-	ShortCutManager.addJsShortCutForElement("jsCode", 38, ShortCutManager.CTRL, "EJS_previousCommandFromHistory()");
-	ShortCutManager.addJsShortCutForElement("jsCode", 13, ShortCutManager.NONE, "EJS_searchFunctions()");
+	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_RETURN, ShortCutManager.CTRL, "EJS_executeJS()");
+	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_DOWN, ShortCutManager.CTRL, "EJS_nextCommandFromHistory()");
+	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_UP, ShortCutManager.CTRL, "EJS_previousCommandFromHistory()");
+	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_SPACE, ShortCutManager.CTRL, "EJS_codeCompletion()");
 	ShortCutManager.addJsShortCutForElement("functionName", 13, ShortCutManager.NONE, "EJS_searchFunctions()");
-	
 }
 
 function EJS_initGlobVars(){
@@ -67,11 +68,15 @@ function EJS_initGlobVars(){
 	var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
                    .getService(Components.interfaces.nsIWindowMediator);
 	EJS_currentTarget = wm.getEnumerator(null).getNext();
+	EJS_commandHistory = executejs.ConfigManager.readHistory();
+	EJS_currentCommandHistoryPos = EJS_commandHistory.length
 }
 
 function EJS_initFormReferences(){
 	EJS_cntTargetWinML = EJS_byId("destObj")
 	EJS_cntConentWinCB = EJS_byId("contentWin")
+	EJS_cntJsCode = EJS_byId("jsCode")
+	EJS_pupCodeCompleation = EJS_byId("pupCodeCompleation")
 	EJS_bcContentWin = EJS_byId("bc_contentWin")
 }
 
@@ -262,9 +267,22 @@ function EJS_searchFunctions(){
 	}
 }
 
+function EJS_doOnUnload(){
+	var maxHistSize = rno_common.Prefs.getCharPref(EJS_PREF_MAX_HIST_PERS_SIZE)
+	var numberToPersist = Math.min(EJS_commandHistory.length, EJS_currentCommandHistoryPos);
+	numberToPersist = Math.min(numberToPersist, maxHistSize)
+	EJS_commandHistory = EJS_commandHistory.slice(0,numberToPersist)
+	executejs.ConfigManager.saveHistory(EJS_commandHistory);
+}
+
+function EJS_codeCompletion(){
+	var bo = EJS_cntJsCode.boxObject;
+	EJS_pupCodeCompleation.showPopup(EJS_cntJsCode,bo.screenX+bo.width,bo.screenY, "context")
+}
+
 //Reopen win for debug purposes
 function EJS_ReopenWin(){
 	window.close()
-	window.opener.open("chrome://executejs/content/executeJS.xul","commandwin", "chrome,width=850,height=450,resizable");
+	window.opener.open(EJS_CHROME_URL+"executeJS.xul","commandwin", "chrome,width=850,height=450,resizable");
 }
 

@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://browser/skin/"?>
-<?xml-stylesheet href="chrome://executejs/content/settings.css" type="text/css"?>
+<?xml-stylesheet href="chrome://executejs/content/common/common.css" type="text/css"?>
 
 <!-- 
  *
  * Execute JS
  * Version 0.1
- * Created by Rudolf Noé
+ * Created by Rudolf Noï¿½
  * 04.12.2005
  *
  * The "keyinputbox" is borrowed from Hit-a-Hint created by 
@@ -38,13 +38,70 @@
         buttons="accept,cancel"
         >
 
-    <script type="application/x-javascript" src="chrome://executejs/content/prefs.js"/>
-    <script type="application/x-javascript" src="chrome://executejs/content/keyCodeMapper.js"/>
+    <script type="application/x-javascript" src="chrome://executejs/content/common/common.js"/>
+    <script type="application/x-javascript" src="chrome://executejs/content/executejs/ejs_common.js"/>
+    <script type="application/x-javascript" src="chrome://executejs/content/executejs/ejs_prefs.js"/>
     
-    <dialogheader id="header" title="Execute JS 0.1"/>
-    <hbox>
-        <label value="Shortcut for opening command window"/>
-        <keyinputbox id="keys.toggleMLB" prefid="executejs.keys.openCommandWin" defaultValue="1079" size="20" allowmodifiers="true"/>
-    </hbox>
-    <textbox id="testtextbox" persist="value"/>
+    <dialogheader id="header" title="Execute JS 0.2"/>
+    <tabbox>
+    	<tabs>
+    		<tab label="General"/>
+    		<tab label="Command Abreviations"/>
+    	</tabs>
+    	<tabpanels>
+    		<tabpanel>
+			    <grid>
+			    	<columns>
+			    		<column></column>
+			    		<column></column>
+			    	</columns>
+			    	<rows>
+			    		<row>
+					        <label value="Max. length of command history"/>
+					        <textbox id="maxHistoryPersist" prefid="executejs.maxHistoryPersist"/>
+			    		</row>
+			    		<row>
+					        <label value="Shortcut for opening command window"/>
+					        <keyinputbox id="keys.toggleMLB" prefid="executejs.keys.openCommandWin" size="20" allowmodifiers="true"/>
+			    		</row>
+			    	</rows>
+			    </grid>
+    		</tabpanel>
+
+    		<tabpanel>
+    			<vbox flex="1">
+    				<grid flex="1">
+    					<columns flex="1">
+    						<column></column>
+    						<column flex="1"></column>
+    					</columns>
+    					<rows>
+    						<row>
+    							<label value="Abbreviation"/>
+    							<textbox id="commandAbbrTB" flex="1"/>
+    						</row>
+							<row>
+    							<label value="Command"/>
+    							<textbox id="commandTB" flex="1"/>
+							</row>
+    					</rows>
+    				</grid>
+    				<hbox flex="1" pack="center">
+    					<button label="Apply" oncommand="EJS_applyCommandAbbr()" accesskey="a"/>
+    					<button label="Remove" oncommand="EJS_removeCommandAbbr()" accesskey="r"/>
+    				</hbox>
+    				<listbox id="commandAbbrLB" prefid="executejs.commandAbbr." flex="1">
+    					<listcols>
+    						<listcol/>
+    						<listcol flex="1"/>
+    					</listcols>
+    					<listhead>
+    						<listheader label="Abbreviation"/>
+    						<listheader label="Command"/>
+    					</listhead>
+    				</listbox>
+    			</vbox>
+    		</tabpanel>
+    	</tabpanels>
+    </tabbox>
 </dialog>
