@@ -39,7 +39,7 @@ function EJS_onInit() {
 }
 
 function EJS_openCommandWin(){
-    window.open("chrome://executejs/content/executeJS.xul","commandwin", "chrome,width=850,height=450,resizable");    
+    window.open("chrome://executejs/content/executejs/executeJS.xul","commandwin", "chrome,width=850,height=450,resizable");    
 }
 
 EJS_prefObserver = {

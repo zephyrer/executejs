@@ -11,10 +11,13 @@
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     xmlns:html="http://www.w3.org/1999/xhtml"
     onload="EJS_doOnload()"
+    onunload="EJS_doOnUnload()"
     sizemode="maximized"
     >
-    <script type="application/x-javascript" src="chrome://executejs/content/executeJS.js"/>
-    <script type="application/x-javascript" src="chrome://executejs/content/shortcutmanager_firefox.js"/>
+    <script type="application/x-javascript" src="chrome://executejs/content/common/common.js"/>
+    <script type="application/x-javascript" src="chrome://executejs/content/executejs/ejs_common.js"/>
+    <script type="application/x-javascript" src="chrome://executejs/content/executejs/executeJS.js"/>
+    <script type="application/x-javascript" src="chrome://executejs/content/executejs/shortcutmanager_firefox.js"/>
 
 	<keyset>
 		<key keycode="VK_F5" oncommand="EJS_ReopenWin()"/>
@@ -24,7 +27,7 @@
 		<broadcaster id="bc_contentWin" disabled="false"/>
 	</broadcasterset>
     <popupset>
-        <popup id="contextpopup">
+        <popup id="pupCodeCompleation" position="after_end">
             <listbox>
                 <listitem label="Test"/>
             </listbox>

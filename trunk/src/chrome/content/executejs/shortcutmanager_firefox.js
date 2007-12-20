@@ -74,6 +74,7 @@ function ShortCutManager_onEvent(event, elementId){
     var shortCutKey = ShortCutManager_encodeEvent(event);
     if(elementId)
     	shortCutKey = elementId + "_" + shortCutKey;
+    rno_common.Utils.logMessage(shortCutKey)
     var shortCutArray = shortCuts[shortCutKey]
     if(shortCutArray){
         ShortCutManager.currentEvent = event;
@@ -87,6 +88,7 @@ function ShortCutManager_onEvent(event, elementId){
 
 function ShortCutManager_onElementEvent(event){
 	var srcElement = event.target;
+    rno_common.Utils.logMessage(srcElement.id)
 	if(srcElement.id)
 		ShortCutManager_onEvent(event, srcElement.id)
 	else 
