@@ -151,7 +151,10 @@ function ShortCut(jsCode, clientId){
 function ShortCut_onEvent(event){
     try{
         var result = window.eval(this.jsCode);
-    }catch(e){}
+    }catch(e){
+    	alert(e)
+    	throw e
+    }
     if(ShortCutManager.SUPPRESS_KEY==result){
 	    event.preventDefault();
     	event.stopPropagation();

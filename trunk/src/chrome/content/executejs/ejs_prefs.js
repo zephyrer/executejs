@@ -49,3 +49,32 @@ function EJS_removeCommandAbbr(){
 	commandAbbrLB.removeItemAt(commandAbbrLB.selectedIndex);	
 }
 
+function EJS_move(direction){
+	var commandAbbrLB = byId("commandAbbrLB")
+	var selIndex = commandAbbrLB.selectedIndex
+	var itemToMove = commandAbbrLB.selectedItem
+	if(itemToMove==null){
+		return
+	}
+	if(direction=="up"){
+		var refItem = commandAbbrLB.getPreviousItem(itemToMove, 1)
+	}else{
+		var refItem = commandAbbrLB.getNextItem(itemToMove,1) 
+	}
+	if(refItem==null){
+		return 
+	}
+	itemToMove = commandAbbrLB.removeItemAt(selIndex)
+	if(direction=="up"){
+		itemToMove = commandAbbrLB.insertBefore(itemToMove, refItem)
+	}else{
+		refItem = commandAbbrLB.getNextItem(refItem,1)
+		if(refItem==null){
+			commandAbbrLB.appendChild(itemToMove)
+		}else{
+			itemToMove = commandAbbrLB.insertBefore(itemToMove, refItem)
+		}
+	}
+	commandAbbrLB.selectItem(itemToMove)
+	commandAbbrLB.focus()
+}

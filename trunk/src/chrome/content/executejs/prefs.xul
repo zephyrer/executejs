@@ -89,6 +89,8 @@
     				<hbox flex="1" pack="center">
     					<button label="Apply" oncommand="EJS_applyCommandAbbr()" accesskey="a"/>
     					<button label="Remove" oncommand="EJS_removeCommandAbbr()" accesskey="r"/>
+    					<button label="Move up" oncommand="EJS_move('up')" accesskey="p"/>
+    					<button label="Move down" oncommand="EJS_move('down')" accesskey="d"/>
     				</hbox>
     				<listbox id="commandAbbrLB" prefid="executejs.commandAbbr" flex="1" disabled="false" seltye="single">
     					<listcols>

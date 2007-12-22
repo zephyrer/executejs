@@ -29,18 +29,18 @@ var EJS_allOpenWins = new Object();
 var EJS_cntTargetWinML = null;
 var EJS_cntConentWinCB = null;
 var EJS_cntJsCode = null;
-var EJS_pupCodeCompleation = null;
+var EJS_pupCodeCompletion = null;
 var EJS_pupCommandAbbr = null;
 var EJS_bcContentWin = null;
 
-var EJS_shortcuts = {
-    cw: "getBrowser().contentWindow",
-    contentWin: "getBrowser().contentWindow",
-    getById: "document.getElementById",
-    doc: "document",
-    print: "EJS_appendToConsole",
-    wo: "wrappedJSObject",
-    props: "EJS_printPropertiesForTarget"
+var EJS_commandAbbrs = {
+//    cw: "getBrowser().contentWindow",
+//    contentWin: "getBrowser().contentWindow",
+//    getById: "document.getElementById",
+//    doc: "document",
+//    print: "EJS_appendToConsole",
+//    wo: "wrappedJSObject",
+//    props: "EJS_printPropertiesForTarget"
 }
 
 function EJS_byId(id){
@@ -66,6 +66,7 @@ function EJS_initShortCuts(){
 	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_DOWN, ShortCutManager.CTRL, "EJS_nextCommandFromHistory()");
 	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_UP, ShortCutManager.CTRL, "EJS_previousCommandFromHistory()");
 	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_SPACE, ShortCutManager.CTRL_SHIFT, "EJS_commandAbbreviations()");
+	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_SPACE, ShortCutManager.CTRL, "EJS_codeCompletion()");
 	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_DOWN, ShortCutManager.NONE, "EJS_contextMnuDown()");
 	ShortCutManager.addJsShortCutForElement("functionName", 13, ShortCutManager.NONE, "EJS_searchFunctions()");
 }
@@ -85,7 +86,7 @@ function EJS_initFormReferences(){
 	EJS_cntTargetWinML = EJS_byId("destObj")
 	EJS_cntConentWinCB = EJS_byId("contentWin")
 	EJS_cntJsCode = EJS_byId("jsCode")
-	EJS_pupCodeCompleation = EJS_byId("pupCodeCompleation")
+	EJS_pupCodeCompletion = EJS_byId("pupCodeCompletion")
 	EJS_pupCommandAbbr = EJS_byId("pupCommandAbbr")
 	EJS_bcContentWin = EJS_byId("bc_contentWin")
 }
@@ -94,14 +95,19 @@ function EJS_initCommandAbbrs(){
 	while(EJS_pupCommandAbbr.childNodes.length>0){
 		EJS_pupCommandAbbr.removeChild(EJS_pupCommandAbbr.firstChild)
 	}
+	EJS_commandAbbrs = new Object()
 	var commandAbbrs = rno_common.Prefs.getPrefsForListbox(EJS_PREF_COMMAND_ABBR)
 	for(var i=0; i<commandAbbrs.length; i++) {
-		var commandAbbr = commandAbbrs[i]
+		//add menuitem
+		var commandAbbrEntry = commandAbbrs[i]
 		var menuitem = document.createElement("menuitem")
-		menuitem.setAttribute("label", commandAbbr[0] + " - " + commandAbbr[1])
-		menuitem.setAttribute("value", commandAbbr[0])
-		menuitem.addEventListener("command", EJS_commitCommandAbbr, true)
+		menuitem.setAttribute("label", commandAbbrEntry[0] + " - " + commandAbbrEntry[1])
+		menuitem.setAttribute("value", commandAbbrEntry[0])
+		menuitem.addEventListener("command", EJS_commitContextMenu, true)
 		EJS_pupCommandAbbr.appendChild(menuitem)
+		
+		//add command abbreviation
+		EJS_commandAbbrs[commandAbbrEntry[0]]=commandAbbrEntry[1]
 	}
 }
 
@@ -132,7 +138,7 @@ function EJS_setCurrentTarget(){
 	}else {
 		EJS_currentTarget = selectedWin;
 	}
-	Components.utils.reportError("EJS_setCurrentTarget(): " + EJS_currentTarget.title);
+	//Components.utils.reportError("EJS_setCurrentTarget(): " + EJS_currentTarget.title);
 }
 
 function EJS_getSelectedWin(){
@@ -144,10 +150,9 @@ function EJS_getSelectedWin(){
 	
 }
 
-function EJS_commitCommandAbbr(event){
-	var commandAbbr=event.target.value
-	rno_common.Utils.copyToClipboard(commandAbbr)
-	//EJS_cntJsCode.editor.paste(Components.interfaces.nsISelectionController.SELECTION_NORMAL);	
+function EJS_commitContextMenu(event){
+	rno_common.Utils.copyToClipboard(event.target.value)
+	//Timeout needed otherwise clipboard isn't filled yet
 	setTimeout("EJS_cntJsCode.editor.paste(1)", 100);	
 }
 
@@ -158,13 +163,8 @@ function EJS_executeJS(){
     }
     EJS_commandHistory[EJS_currentCommandHistoryPos]=code;
     try{
-    	var result = EJS_currentTarget.eval(EJS_replaceShortcuts(code));    
+    	var result = EJS_evalStringOnTarget(code)    
     }catch(e){
-        /*var m = ""
-        for(i in e){
-            m = m + i + ": " + e[i] + "\n"
-        }
-        alert(m);*/
         alert(e);
         EJS_jsCodeField.focus();
         return;
@@ -180,12 +180,16 @@ function EJS_executeJS(){
     return result;
 }
 
+function EJS_evalStringOnTarget(string){
+	return EJS_currentTarget.eval(EJS_replaceShortcuts(string))	
+}
+
 function EJS_replaceShortcuts(code){
     if(code==null || code=="")
         return;
-    for(var i in EJS_shortcuts){
+    for(var i in EJS_commandAbbrs){
         var regexp = new RegExp("\\b"+i+"\\b", "ig");
-        code = code.replace(regexp, EJS_shortcuts[i]);
+        code = code.replace(regexp, EJS_commandAbbrs[i]);
     }
     return code;
 }
@@ -320,8 +324,80 @@ function EJS_commandAbbreviations(){
 }
 
 function EJS_codeCompletion(){
+	//Remove old items
+	var childs = EJS_pupCodeCompletion.childNodes
+	while (childs.length>0) {
+		EJS_pupCodeCompletion.removeChild(EJS_pupCodeCompletion.firstChild)
+	}
+	var selection = EJS_jsCodeField.editor.selection
+	var focusNodeText = selection.focusNode.nodeValue
+	if(focusNodeText==null){
+		return
+	}
+	var focusOffset = selection.focusOffset
+	var evalString = focusNodeText.substring(0,focusOffset)
+	var lastSpaceIndex = evalString.lastIndexOf(" ");
+	var lastDotIndex = evalString.lastIndexOf(".")
+	var objString = evalString.substring(lastSpaceIndex+1, lastDotIndex)
+	if(lastDotIndex!=-1){
+		var attrPrefix = evalString.substring(lastDotIndex+1)
+	}else{
+		var attrPrefix = evalString
+	}
+	var error = false
+	if(objString==""){
+		var evalObj = window
+	}else{
+		try{
+		var evalObj = EJS_evalStringOnTarget(objString)
+		}catch(e){
+			error = true
+		}
+	}
+	if (error) {
+		var mi = document.createElement("menuitem")
+		mi.setAttribute("label", "Object could not be determined")
+		EJS_pupCodeCompletion.appendChild(mi)
+	}else{
+		//2 dim: label, value
+		var menuArray = new Array()
+		var i = 0;
+		for(prop in evalObj) {
+			if(attrPrefix.length!=0 && prop.indexOf(attrPrefix)!=0){
+				continue;
+			}
+			var miLabel = prop
+			try{
+				if(typeof evalObj[prop] == "function"){
+					miLabel += "()"
+				}
+			}catch(e){
+				//on props error occurs on typeof operator!!
+			}
+			var miValue = miLabel				
+			if(attrPrefix.length>0){
+				//Shorten for later pasting into textbox
+				miValue = miLabel.substring(attrPrefix.length)
+			}
+			menuArray[i] = [miLabel, miValue]
+			i++
+		}
+		menuArray.sort()
+		for(var i=0; i<menuArray.length; i++) {
+			var mi = document.createElement("menuitem")
+			mi.setAttribute("label", menuArray[i][0])
+			mi.setAttribute("value", menuArray[i][1])
+			mi.addEventListener("command", EJS_commitContextMenu, true)
+			EJS_pupCodeCompletion.appendChild(mi)
+		}
+		if(EJS_pupCodeCompletion.childNodes.length==0){
+			var mi = document.createElement("menuitem")
+			mi.setAttribute("label", "Nothing found")
+			EJS_pupCodeCompletion.appendChild(mi)
+		}
+	}
 	var bo = EJS_cntJsCode.boxObject;
-	EJS_pupCodeCompleation.showPopup(EJS_cntJsCode,bo.screenX+bo.width,bo.screenY, "context")
+	EJS_pupCodeCompletion.showPopup(EJS_cntJsCode,bo.screenX+bo.width,bo.screenY, "popup")
 }
 
 function EJS_openConfig(){

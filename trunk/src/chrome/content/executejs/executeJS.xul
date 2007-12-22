@@ -28,8 +28,8 @@
 		<broadcaster id="bc_contentWin" disabled="false"/>
 	</broadcasterset>
     <popupset>
-        <menupopup id="pupCommandAbbr" position="after_end" ignorekeys="false" onkeydown="alert('')">
-        </menupopup>
+        <menupopup id="pupCommandAbbr" position="after_end" ignorekeys="false"/>
+        <menupopup id="pupCodeCompletion" position="after_end" ignorekeys="false"/>
     </popupset>
 
     <vbox flex="1">
