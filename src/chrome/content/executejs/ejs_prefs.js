@@ -13,6 +13,7 @@ function byId(id){
 
 function doOnload(){
 	rno_common.Prefs.loadPrefs(document);
+	byId("commandAbbrLB").addEventListener("select", EJS_commandAbbrSelChanged, true)
 }
 
 function saveUserPrefs(){
@@ -77,4 +78,13 @@ function EJS_move(direction){
 	}
 	commandAbbrLB.selectItem(itemToMove)
 	commandAbbrLB.focus()
+}
+
+function EJS_commandAbbrSelChanged(){
+	var commandAbbrLB = byId("commandAbbrLB")
+	var selItem = commandAbbrLB.selectedItem
+	var abbr = selItem.firstChild.getAttribute("value");
+	byId("commandAbbrTB").value=abbr
+	var command = selItem.childNodes.item(1).getAttribute("value")
+	byId("commandTB").value = command
 }
