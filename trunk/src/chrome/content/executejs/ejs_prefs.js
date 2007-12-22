@@ -17,7 +17,7 @@ function doOnload(){
 
 function saveUserPrefs(){
 	rno_common.Prefs.savePrefs(document);
-	rno_common.Prefs.notifyObservers("EJS-PrefChange");
+	rno_common.Prefs.notifyObservers(EJS_PREF_OBSERVER);
 }
 
 function EJS_applyCommandAbbr(){
@@ -42,11 +42,10 @@ function EJS_applyCommandAbbr(){
 		var commandListcell = newListitem.childNodes.item(1)
 		commandListcell.setAttribute("label", command)
 	}
-	newListitem.setAttribute("value", commandAbbr+EJS_COMMAND_ABBR_SEPARATOR+command)
 }
 
 function EJS_removeCommandAbbr(){
 	var commandAbbrLB = byId("commandAbbrLB")
-	commandAbbrLB.removeItemAt(commandAbbrLB.selectedItem);	
+	commandAbbrLB.removeItemAt(commandAbbrLB.selectedIndex);	
 }
 

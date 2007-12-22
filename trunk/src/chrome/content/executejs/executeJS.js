@@ -30,6 +30,7 @@ var EJS_cntTargetWinML = null;
 var EJS_cntConentWinCB = null;
 var EJS_cntJsCode = null;
 var EJS_pupCodeCompleation = null;
+var EJS_pupCommandAbbr = null;
 var EJS_bcContentWin = null;
 
 var EJS_shortcuts = {
@@ -47,17 +48,25 @@ function EJS_byId(id){
 }
 
 function EJS_doOnload(){
-    EJS_initGlobVars();
-    EJS_initShortCuts();
-    EJS_initFormReferences();
-    document.getElementById("jsCode").select();
+    try{
+	    EJS_initGlobVars();
+	    EJS_initShortCuts();
+	    EJS_initFormReferences();
+	    EJS_initCommandAbbrs();
+	    EJS_initObserver();
+	    EJS_cntJsCode.select();
+    }catch(e){
+    	alert(e)
+    	throw e
+    }
 }
 
 function EJS_initShortCuts(){
 	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_RETURN, ShortCutManager.CTRL, "EJS_executeJS()");
 	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_DOWN, ShortCutManager.CTRL, "EJS_nextCommandFromHistory()");
 	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_UP, ShortCutManager.CTRL, "EJS_previousCommandFromHistory()");
-	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_SPACE, ShortCutManager.CTRL, "EJS_codeCompletion()");
+	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_SPACE, ShortCutManager.CTRL_SHIFT, "EJS_commandAbbreviations()");
+	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_DOWN, ShortCutManager.NONE, "EJS_contextMnuDown()");
 	ShortCutManager.addJsShortCutForElement("functionName", 13, ShortCutManager.NONE, "EJS_searchFunctions()");
 }
 
@@ -77,7 +86,28 @@ function EJS_initFormReferences(){
 	EJS_cntConentWinCB = EJS_byId("contentWin")
 	EJS_cntJsCode = EJS_byId("jsCode")
 	EJS_pupCodeCompleation = EJS_byId("pupCodeCompleation")
+	EJS_pupCommandAbbr = EJS_byId("pupCommandAbbr")
 	EJS_bcContentWin = EJS_byId("bc_contentWin")
+}
+
+function EJS_initCommandAbbrs(){
+	while(EJS_pupCommandAbbr.childNodes.length>0){
+		EJS_pupCommandAbbr.removeChild(EJS_pupCommandAbbr.firstChild)
+	}
+	var commandAbbrs = rno_common.Prefs.getPrefsForListbox(EJS_PREF_COMMAND_ABBR)
+	for(var i=0; i<commandAbbrs.length; i++) {
+		var commandAbbr = commandAbbrs[i]
+		var menuitem = document.createElement("menuitem")
+		menuitem.setAttribute("label", commandAbbr[0] + " - " + commandAbbr[1])
+		menuitem.setAttribute("value", commandAbbr[0])
+		menuitem.addEventListener("command", EJS_commitCommandAbbr, true)
+		EJS_pupCommandAbbr.appendChild(menuitem)
+	}
+}
+
+function EJS_initObserver(){
+	EJS_prefObserver = rno_common.Utils.createObserver(EJS_initAfterPrefChange);
+	rno_common.Utils.registerObserver(EJS_PREF_OBSERVER, EJS_prefObserver)
 }
 
 function EJS_targetChanged(menuitem){
@@ -114,9 +144,19 @@ function EJS_getSelectedWin(){
 	
 }
 
+function EJS_commitCommandAbbr(event){
+	var commandAbbr=event.target.value
+	rno_common.Utils.copyToClipboard(commandAbbr)
+	//EJS_cntJsCode.editor.paste(Components.interfaces.nsISelectionController.SELECTION_NORMAL);	
+	setTimeout("EJS_cntJsCode.editor.paste(1)", 100);	
+}
+
 function EJS_executeJS(){
     var code = EJS_jsCodeField.value;
-    EJS_commandHistory[EJS_currentCommandHistoryPos++]=code;
+    if(EJS_currentCommandHistoryPos==EJS_commandHistory.length-1){
+    	EJS_currentCommandHistoryPos++
+    }
+    EJS_commandHistory[EJS_currentCommandHistoryPos]=code;
     try{
     	var result = EJS_currentTarget.eval(EJS_replaceShortcuts(code));    
     }catch(e){
@@ -269,15 +309,23 @@ function EJS_searchFunctions(){
 
 function EJS_doOnUnload(){
 	var maxHistSize = rno_common.Prefs.getCharPref(EJS_PREF_MAX_HIST_PERS_SIZE)
-	var numberToPersist = Math.min(EJS_commandHistory.length, EJS_currentCommandHistoryPos);
-	numberToPersist = Math.min(numberToPersist, maxHistSize)
-	EJS_commandHistory = EJS_commandHistory.slice(0,numberToPersist)
+	var startIndex = Math.max(0, EJS_commandHistory.length-maxHistSize)
+	EJS_commandHistory = EJS_commandHistory.slice(startIndex)
 	executejs.ConfigManager.saveHistory(EJS_commandHistory);
+}
+
+function EJS_commandAbbreviations(){
+	var bo = EJS_cntJsCode.boxObject;
+	EJS_pupCommandAbbr.showPopup(EJS_cntJsCode,bo.screenX+bo.width,bo.screenY, "popup")
 }
 
 function EJS_codeCompletion(){
 	var bo = EJS_cntJsCode.boxObject;
 	EJS_pupCodeCompleation.showPopup(EJS_cntJsCode,bo.screenX+bo.width,bo.screenY, "context")
+}
+
+function EJS_openConfig(){
+	openDialog(EJS_CHROME_URL+"prefs.xul", "prefs", "chrome, modal, centerscreen")
 }
 
 //Reopen win for debug purposes
@@ -286,3 +334,11 @@ function EJS_ReopenWin(){
 	window.opener.open(EJS_CHROME_URL+"executeJS.xul","commandwin", "chrome,width=850,height=450,resizable");
 }
 
+//Reopen win for debug purposes
+function EJS_ReloadScripts(){
+	RNO_loadScript("chrome://executejs/content/executejs/ejs_common.js")	
+}
+
+function EJS_initAfterPrefChange(){
+	EJS_initCommandAbbrs();
+}

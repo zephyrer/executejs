@@ -28,34 +28,19 @@ window.addEventListener('load',  EJS_onInit, false);
 */
 function EJS_onInit() {
     //Add preferences-observer
-    var observerService = Components.classes["@mozilla.org/observer-service;1"].
-        getService(Components.interfaces.nsIObserverService);
-    observerService.addObserver(EJS_prefObserver, "EJS-PrefChange", true);
-	EJS_combinedShortCutCode = Utils.getCharPref(EJS_userPrefShortCutOpenCommandWin);
-	//Default Alt+Shift+Ctrl + c
-	if(!EJS_combinedShortCutCode)
-		Utils.prefs.setCharPref(EJS_userPrefShortCutOpenCommandWin, "1079");
-    EJS_prefObserver.observe();
+    EJS_prefObserver = rno_common.Utils.createObserver(EJS_init);
+    rno_common.Utils.registerObserver(EJS_PREF_OBSERVER, EJS_prefObserver);
+	EJS_combinedShortCutCode = rno_common.Prefs.getCharPref(EJS_userPrefShortCutOpenCommandWin);
+    EJS_init();
 }
 
 function EJS_openCommandWin(){
     window.open("chrome://executejs/content/executejs/executeJS.xul","commandwin", "chrome,width=850,height=450,resizable");    
 }
 
-EJS_prefObserver = {
-    observe: function ( subject , topic , data ){
+function EJS_init(){
 	    ShortCutManager.clearAllShortCutsForClientId("EJS");
-    	EJS_combinedShortCutCode = Utils.getCharPref(EJS_userPrefShortCutOpenCommandWin);
+    	EJS_combinedShortCutCode = rno_common.Prefs.getCharPref(EJS_userPrefShortCutOpenCommandWin);
     	if(EJS_combinedShortCutCode)
 	    	ShortCutManager.addJsShortCutWithCombinedKeyCode(EJS_combinedShortCutCode, "EJS_openCommandWin()", "EJS");    
-    },
-	QueryInterface: function(iid) {
-		if (!iid.equals(Components.interfaces.nsISupports)
-				&& !iid.equals(Components.interfaces.nsISupportsWeakReference)
-				&& !iid.equals(Components.interfaces.nsIObserver)) {
-			dump("Hightlight Focus Window Pref-Observer factory object: QI unknown interface: " + iid + "\n");
-			throw Components.results.NS_ERROR_NO_INTERFACE; }
-		return this;
-	}
 }
-

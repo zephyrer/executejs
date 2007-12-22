@@ -46,7 +46,7 @@
     <tabbox>
     	<tabs>
     		<tab label="General"/>
-    		<tab label="Command Abreviations"/>
+    		<tab label="Command Abbreviations"/>
     	</tabs>
     	<tabpanels>
     		<tabpanel>
@@ -90,7 +90,7 @@
     					<button label="Apply" oncommand="EJS_applyCommandAbbr()" accesskey="a"/>
     					<button label="Remove" oncommand="EJS_removeCommandAbbr()" accesskey="r"/>
     				</hbox>
-    				<listbox id="commandAbbrLB" prefid="executejs.commandAbbr." flex="1">
+    				<listbox id="commandAbbrLB" prefid="executejs.commandAbbr" flex="1" disabled="false" seltye="single">
     					<listcols>
     						<listcol/>
     						<listcol flex="1"/>

@@ -6,3 +6,5 @@
 //Max. number of commands which will be persisted on exit
 pref("executejs.keys.openCommandWin", "1079");
 pref("executejs.maxHistoryPersist", "100");
+pref("executejs.commandAbbr", "");
+
