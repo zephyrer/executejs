@@ -45,8 +45,8 @@
     <dialogheader id="header" title="Execute JS 0.2"/>
     <tabbox>
     	<tabs>
-    		<tab label="General"/>
-    		<tab label="Command Abbreviations"/>
+    		<tab label="General" accesskey="g"/>
+    		<tab label="Command Abbreviations" accesskey="c"/>
     	</tabs>
     	<tabpanels>
     		<tabpanel>
@@ -77,7 +77,7 @@
     					</columns>
     					<rows>
     						<row>
-    							<label value="Abbreviation"/>
+    							<label value="Abbreviation" control="commandAbbrTB" accesskey="b"/>
     							<textbox id="commandAbbrTB" flex="1"/>
     						</row>
 							<row>
@@ -92,7 +92,7 @@
     					<button label="Move up" oncommand="EJS_move('up')" accesskey="p"/>
     					<button label="Move down" oncommand="EJS_move('down')" accesskey="d"/>
     				</hbox>
-    				<listbox id="commandAbbrLB" prefid="executejs.commandAbbr" flex="1" disabled="false" seltye="single">
+    				<listbox id="commandAbbrLB" prefid="executejs.commandAbbr" flex="1" disabled="false" >
     					<listcols>
     						<listcol/>
     						<listcol flex="1"/>
