@@ -316,6 +316,6 @@
 	if (navigator.platform.toLowerCase().indexOf('win') > -1) {
 		DirIO.sep = '\\';
 	}
-	
-	rno.Utils.bindToNamespace("rno.sew.common", "FileIO", FileIO);
+
+	rno_common.Namespace.bindToNamespace(rno_common.Namespace.COMMON_NS, "FileIO", FileIO);
 })();
