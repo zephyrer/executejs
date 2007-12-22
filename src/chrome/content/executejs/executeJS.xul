@@ -21,34 +21,24 @@
 
 	<keyset>
 		<key keycode="VK_F5" oncommand="EJS_ReopenWin()"/>
+		<key modifiers="control" keycode="VK_F5" oncommand="EJS_ReloadScripts()"/>
 	</keyset>
 	
 	<broadcasterset>
 		<broadcaster id="bc_contentWin" disabled="false"/>
 	</broadcasterset>
     <popupset>
-        <popup id="pupCodeCompleation" position="after_end">
-            <listbox>
-                <listitem label="Test"/>
-            </listbox>
-        </popup>
+        <menupopup id="pupCommandAbbr" position="after_end" ignorekeys="false" onkeydown="alert('')">
+        </menupopup>
     </popupset>
 
     <vbox flex="1">
         <menubar id="sample-menubar">
-          <menu id="file-menu" label="File" accesskey="f">
+          <menu id="file-menu" label="Execute JS" accesskey="x">
             <menupopup id="file-popup">
-              <menuitem label="New"/>
-              <menuitem label="Open"/>
-              <menuitem label="Save"/>
+              <menuitem label="Configuration" oncommand="EJS_openConfig()"/>
               <menuseparator/>
-              <menuitem label="Exit" oncommand="alert('')"/>
-            </menupopup>
-          </menu>
-          <menu id="edit-menu" label="Edit">
-            <menupopup id="edit-popup">
-              <menuitem label="Undo"/>
-              <menuitem label="Redo"/>
+              <menuitem label="Exit" oncommand="window.close()"/>
             </menupopup>
           </menu>
         </menubar>
