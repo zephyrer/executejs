@@ -18,15 +18,18 @@
  * limitations under the License.
  */
 
-var EJS_currentTarget = null;
+var EJS_currentTargetWin = null;
+var EJS_currentTargetObj = null;
 var EJS_commandHistory = new Array();
 var EJS_currentCommandHistoryPos = 0;
 var EJS_allOpenWins = new Object();
 
 //Form elements
 var EJS_cntTargetWinML = null;
+var EJS_cntContentWinCB = null;
 var EJS_cntTargetObjectTB = null;
 var EJS_cntJsCode = null;
+var EJS_cntFunctionNameML = null;
 var EJS_pupCodeCompletion = null;
 var EJS_pupCommandAbbr = null;
 
@@ -62,14 +65,15 @@ function EJS_initShortCuts(){
 
 function EJS_initGlobVars(){
 	EJS_cntTargetWinML = EJS_byId("targetWin")
+	EJS_cntContentWinCB = EJS_byId("contentWinCB")
 	EJS_cntTargetObjectTB = EJS_byId("targetObj")
 	EJS_cntJsCode = EJS_byId("jsCode")
+	EJS_cntFunctionNameML = EJS_byId("functionName")
 	EJS_pupCodeCompletion = EJS_byId("pupCodeCompletion")
 	EJS_pupCommandAbbr = EJS_byId("pupCommandAbbr")
 	EJS_cntTargetWinML.selectedIndex = 1;
-	var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-                   .getService(Components.interfaces.nsIWindowMediator);
-	EJS_currentTarget = wm.getEnumerator(null).getNext();
+	EJS_targetWinChanged();
+	EJS_targetObjChanged();
 	EJS_commandHistory = executejs.ConfigManager.readHistory();
 	EJS_currentCommandHistoryPos = EJS_commandHistory.length
 }
@@ -99,22 +103,36 @@ function EJS_initObserver(){
 	rno_common.Utils.registerObserver(EJS_PREF_OBSERVER, EJS_prefObserver)
 }
 
-function EJS_targetChanged(menuitem){
-	//Set urrent target
-  	var selectedWin = EJS_getSelectedWin();
-  	
-  	EJS_setCurrentTarget();
+function EJS_targetWinChanged(){
+	//Set current target
+  	EJS_currentTargetWin = EJS_getSelectedWin();
+  	if(EJS_currentTargetWin.getBrowser!=null){
+  		EJS_cntContentWinCB.disabled=false
+  	}else if(EJS_currentTargetWin.getBrowser==null){
+  		EJS_cntContentWinCB.disabled=true
+	}
+	EJS_targetObjChanged()
+	//Todo
+//	Components.utils.reportError("EJS_targetWinChanged(): " + EJS_currentTargetWin + ": " + 
+	//	EJS_currentTargetWin.document.title);
 }
 
-function EJS_setCurrentTarget(){
-	var selectedWin = EJS_getSelectedWin();
-	EJS_currentTarget = selectedWin
-	var targetObj = EJS_cntTargetObjectTB
-	if(EJS_cntTargetObjectTB.value.length>0){
-		EJS_currentTarget = selectedWin.eval(EJS_cntTargetObjectTB.value)
+function EJS_targetObjChanged() {
+	//Check whether object valid
+	var objString = EJS_cntTargetObjectTB.value
+	EJS_cntTargetObjectTB.inputField.style.backgroundColor=""
+	if(objString.length>0){
+		try {
+			EJS_currentTargetObj = EJS_evalStringOnTarget(EJS_cntTargetObjectTB.value)
+		}catch(e){
+			EJS_currentTargetObj=null
+			EJS_cntTargetObjectTB.inputField.style.backgroundColor="#FF5F3F"
+		}
+	}else if(EJS_cntContentWinCB.checked==true && EJS_cntContentWinCB.disabled==false){
+		EJS_currentTargetObj=EJS_currentTargetWin.getBrowser().contentWindow.wrappedJSObject
+	}else{
+		EJS_currentTargetObj=EJS_currentTargetWin
 	}
-	//Todo
-	//Components.utils.reportError("EJS_setCurrentTarget(): " + EJS_currentTarget.title);
 }
 
 function EJS_getSelectedWin(){
@@ -155,7 +173,11 @@ function EJS_executeJS(){
 }
 
 function EJS_evalStringOnTarget(string){
-	return EJS_currentTarget.eval(EJS_replaceShortcuts(string))	
+	var contentWin = null
+	if(EJS_cntContentWinCB.checked==true && EJS_cntContentWinCB.disabled==false){
+		contentWin = EJS_currentTargetWin.getBrowser().contentWindow.wrappedJSObject
+	}
+	return EJS_currentTargetWin.eval(EJS_replaceShortcuts(string), contentWin)	
 }
 
 function EJS_replaceShortcuts(code){
@@ -209,7 +231,7 @@ function EJS_saveFunction(){
         newParams[i]=params[i];
     }
     
-    EJS_currentTarget[fctName] = new Function(newParams[0], newParams[1], newParams[2], newParams[3], 
+    EJS_currentTargetObj[fctName] = new Function(newParams[0], newParams[1], newParams[2], newParams[3], 
         newParams[4], newParams[5], newParams[6], newParams[7], newParams[8], newParams[9], body);
 }
 
@@ -226,7 +248,10 @@ function EJS_printPropertiesForTarget(target){
 	}
 	var index = 0;
 	for(var i in target){
-    	result[index++] = i + ": " + target[i];		
+		//try catch as error could occur, but why???
+		try{
+    		result[index++] = i + ": " + target[i];
+		}catch(e){}		
 	}
 	EJS_appendToConsole(result.join("\n"));
 }
@@ -258,8 +283,12 @@ function EJS_searchFunctions(){
 	functionMenuList.removeAllItems();
 	var counter = 0;
 	var exactMatch = null;
-	for(var i in EJS_currentTarget){
-		var member = EJS_currentTarget[i];
+	for(var i in EJS_currentTargetObj){
+		try{
+			var member = EJS_currentTargetObj[i];
+		}catch(e){
+			continue
+		}
 		if(typeof member == "function" &&
 			i.toLowerCase().indexOf(searchString)!=-1){
 				if(i.toLowerCase()==searchString){
@@ -273,12 +302,12 @@ function EJS_searchFunctions(){
 	if(counter>1){
 		setTimeout('document.getElementById("functionName").menupopup.showPopup();document.getElementById("functionName").inputField.focus()', 500);
 		if(exactMatch!=null){
-			fctCodeField.value = EJS_currentTarget[exactMatch];
+			fctCodeField.value = EJS_currentTargetObj[exactMatch];
 		}
 	}
 	else if (counter==1){
 		functionMenuList.selectedIndex = 0;
-		fctCodeField.value = EJS_currentTarget[functionMenuList.value];
+		fctCodeField.value = EJS_currentTargetObj[functionMenuList.value];
 		fctCodeField.focus();
 	}else{
 		fctCodeField.value = "No match found"
@@ -320,11 +349,12 @@ function EJS_codeCompletion(){
 	}
 	var error = false
 	if(objString==""){
-		var evalObj = window
+		var evalObj = EJS_currentTargetWin
 	}else{
 		try{
 		var evalObj = EJS_evalStringOnTarget(objString)
 		}catch(e){
+			alert(e)
 			error = true
 		}
 	}

@@ -48,7 +48,7 @@
                     <row align="end" height="30px">
                 		<hbox align="center">
 				            <label control="targetWin" accesskey="w" value="Target window" />
-				            <menulist id="targetWin" oncommand="EJS_targetChanged(event.target);" tabindex="1" flex="1">
+				            <menulist id="targetWin" oncommand="EJS_targetWinChanged(event.target);" tabindex="1" flex="1">
 				            	<menupopup id="window-menu" datasources="rdf:window-mediator"
 				            		ref="NC:WindowMediatorRoot">
 				            		<template>
@@ -58,6 +58,8 @@
 				            		</template>
 				            	</menupopup>
 				            </menulist>
+				            <checkbox id="contentWinCB" persist="checked" disabled="false" label="Content Window" accesskey="t" 
+				            	oncommand="EJS_targetWinChanged()" tabindex="2"/>
                 		</hbox>
                     </row>
                     <row style="height:21px;">
@@ -97,12 +99,7 @@
                 	        <rows>
                 	            <row align="center">
 			          	            <label control="targetObj" value="Target object" accesskey="o"/>
-						            <menulist id="targetObj" editable="true" oncommand="EJS_targetChanged(event.target);" tabindex="14" flex="1">
-						            	<menupopup> 
-						            		<menuitem label="Content Window" value="getBrowser().contentWindow.wrappedJSObject"/>
-						            	</menupopup>
-						            </menulist>
-                	              
+			          	            <textbox id="targetObj" onchange="EJS_targetObjChanged()" tabindex="14" flex="1"/>
                 	            </row>
                 	            <row align="center">
 		                            <label value="Function name" accesskey="f" control="functionName"></label>    
