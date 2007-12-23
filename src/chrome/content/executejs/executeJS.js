@@ -21,27 +21,17 @@
 var EJS_currentTarget = null;
 var EJS_commandHistory = new Array();
 var EJS_currentCommandHistoryPos = 0;
-var EJS_jsCodeField = null;
-var EJS_openWinMenuList = null;
 var EJS_allOpenWins = new Object();
 
 //Form elements
 var EJS_cntTargetWinML = null;
-var EJS_cntConentWinCB = null;
+var EJS_cntTargetObjectTB = null;
 var EJS_cntJsCode = null;
 var EJS_pupCodeCompletion = null;
 var EJS_pupCommandAbbr = null;
-var EJS_bcContentWin = null;
 
-var EJS_commandAbbrs = {
-//    cw: "getBrowser().contentWindow",
-//    contentWin: "getBrowser().contentWindow",
-//    getById: "document.getElementById",
-//    doc: "document",
-//    print: "EJS_appendToConsole",
-//    wo: "wrappedJSObject",
-//    props: "EJS_printPropertiesForTarget"
-}
+//Map containing the command abbreviations
+var EJS_commandAbbrs = new Object()
 
 function EJS_byId(id){
 	return document.getElementById(id);
@@ -51,10 +41,9 @@ function EJS_doOnload(){
     try{
 	    EJS_initGlobVars();
 	    EJS_initShortCuts();
-	    EJS_initFormReferences();
 	    EJS_initCommandAbbrs();
 	    EJS_initObserver();
-	    EJS_cntJsCode.select();
+	    EJS_cntJsCode.focus();
     }catch(e){
     	alert(e)
     	throw e
@@ -72,23 +61,17 @@ function EJS_initShortCuts(){
 }
 
 function EJS_initGlobVars(){
-	EJS_jsCodeField = document.getElementById("jsCode");
-	EJS_openWinMenuList = document.getElementById("destObj")
-	EJS_openWinMenuList.selectedIndex = 1;
+	EJS_cntTargetWinML = EJS_byId("targetWin")
+	EJS_cntTargetObjectTB = EJS_byId("targetObj")
+	EJS_cntJsCode = EJS_byId("jsCode")
+	EJS_pupCodeCompletion = EJS_byId("pupCodeCompletion")
+	EJS_pupCommandAbbr = EJS_byId("pupCommandAbbr")
+	EJS_cntTargetWinML.selectedIndex = 1;
 	var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
                    .getService(Components.interfaces.nsIWindowMediator);
 	EJS_currentTarget = wm.getEnumerator(null).getNext();
 	EJS_commandHistory = executejs.ConfigManager.readHistory();
 	EJS_currentCommandHistoryPos = EJS_commandHistory.length
-}
-
-function EJS_initFormReferences(){
-	EJS_cntTargetWinML = EJS_byId("destObj")
-	EJS_cntConentWinCB = EJS_byId("contentWin")
-	EJS_cntJsCode = EJS_byId("jsCode")
-	EJS_pupCodeCompletion = EJS_byId("pupCodeCompletion")
-	EJS_pupCommandAbbr = EJS_byId("pupCommandAbbr")
-	EJS_bcContentWin = EJS_byId("bc_contentWin")
 }
 
 function EJS_initCommandAbbrs(){
@@ -117,37 +100,28 @@ function EJS_initObserver(){
 }
 
 function EJS_targetChanged(menuitem){
-	//Set current target
+	//Set urrent target
   	var selectedWin = EJS_getSelectedWin();
   	
-  	if (selectedWin.getBrowser!=null){
-	  	//Disable/Enable Function checkbox
-  		 EJS_bcContentWin.setAttribute("disabled","false")
-  	}else{
-  		 EJS_bcContentWin.setAttribute("disabled","true")
-  	}
   	EJS_setCurrentTarget();
 }
 
 function EJS_setCurrentTarget(){
 	var selectedWin = EJS_getSelectedWin();
-	if (selectedWin.getBrowser!=null &&
-		EJS_cntConentWinCB.disabled==false &&
-		EJS_cntConentWinCB.checked==true){
-		EJS_currentTarget = selectedWin.getBrowser().contentWindow.wrappedJSObject;
-	}else {
-		EJS_currentTarget = selectedWin;
+	EJS_currentTarget = selectedWin
+	var targetObj = EJS_cntTargetObjectTB
+	if(EJS_cntTargetObjectTB.value.length>0){
+		EJS_currentTarget = selectedWin.eval(EJS_cntTargetObjectTB.value)
 	}
+	//Todo
 	//Components.utils.reportError("EJS_setCurrentTarget(): " + EJS_currentTarget.title);
 }
 
 function EJS_getSelectedWin(){
 	var mediator = Components.classes["@mozilla.org/rdf/datasource;1?name=window-mediator"].getService();
   	mediator.QueryInterface(Components.interfaces.nsIWindowDataSource);
-
   	var resource = EJS_cntTargetWinML.selectedItem.getAttribute('id')
   	return mediator.getWindowForResource(resource);
-	
 }
 
 function EJS_commitContextMenu(event){
@@ -157,7 +131,7 @@ function EJS_commitContextMenu(event){
 }
 
 function EJS_executeJS(){
-    var code = EJS_jsCodeField.value;
+    var code = EJS_cntJsCode.value;
     if(EJS_currentCommandHistoryPos==EJS_commandHistory.length-1){
     	EJS_currentCommandHistoryPos++
     }
@@ -166,7 +140,7 @@ function EJS_executeJS(){
     	var result = EJS_evalStringOnTarget(code)    
     }catch(e){
         alert(e);
-        EJS_jsCodeField.focus();
+        EJS_cntJsCode.focus();
         return;
     }
     if(result==null){
@@ -176,7 +150,7 @@ function EJS_executeJS(){
 	}else{
 		EJS_appendToConsole(result);
 	}
-    EJS_jsCodeField.focus();
+    EJS_cntJsCode.focus();
     return result;
 }
 
@@ -260,13 +234,13 @@ function EJS_printPropertiesForTarget(target){
 function EJS_nextCommandFromHistory(){
 	if(EJS_currentCommandHistoryPos>=EJS_commandHistory.length-1)
 		return;
-	EJS_jsCodeField.value = EJS_commandHistory[++EJS_currentCommandHistoryPos];
+	EJS_cntJsCode.value = EJS_commandHistory[++EJS_currentCommandHistoryPos];
 }
 
 function EJS_previousCommandFromHistory(){
 	if(EJS_currentCommandHistoryPos==0)
 		return;
-	EJS_jsCodeField.value = EJS_commandHistory[--EJS_currentCommandHistoryPos];
+	EJS_cntJsCode.value = EJS_commandHistory[--EJS_currentCommandHistoryPos];
 }
 
 function EJS_createMenuItem(id, aLabel, value) {
@@ -329,7 +303,7 @@ function EJS_codeCompletion(){
 	while (childs.length>0) {
 		EJS_pupCodeCompletion.removeChild(EJS_pupCodeCompletion.firstChild)
 	}
-	var selection = EJS_jsCodeField.editor.selection
+	var selection = EJS_cntJsCode.editor.selection
 	var focusNodeText = selection.focusNode.nodeValue
 	if(focusNodeText==null){
 		return

@@ -24,9 +24,6 @@
 		<key modifiers="control" keycode="VK_F5" oncommand="EJS_ReloadScripts()"/>
 	</keyset>
 	
-	<broadcasterset>
-		<broadcaster id="bc_contentWin" disabled="false"/>
-	</broadcasterset>
     <popupset>
         <menupopup id="pupCommandAbbr" position="after_end" ignorekeys="false"/>
         <menupopup id="pupCodeCompletion" position="after_end" ignorekeys="false"/>
@@ -42,21 +39,6 @@
             </menupopup>
           </menu>
         </menubar>
-        <hbox align="center">
-            <label control="destObj" accesskey="t" value="Target object" />
-            <menulist id="destObj" oncommand="EJS_targetChanged(event.target);" tabindex="1">
-            	<menupopup id="window-menu" datasources="rdf:window-mediator"
-            		ref="NC:WindowMediatorRoot">
-            		<template>
-            			<rule>
-            				<menuitem uri="rdf:*" label="rdf:http://home.netscape.com/NC-rdf#Name" />
-            			</rule>
-            		</template>
-            	</menupopup>
-            </menulist>
-            <checkbox id="contentWin" label="Content Window" observes="bc_contentWin" tabindex="2" 
-            	oncommand="EJS_setCurrentTarget()"/>
-        </hbox>
         <hbox  flex="1">
             <grid id="leftgrid" flex="1" persist="width">
                 <columns>
@@ -64,20 +46,26 @@
                 </columns>
                 <rows flex="1" >
                     <row align="end" height="30px">
+                		<hbox align="center">
+				            <label control="targetWin" accesskey="w" value="Target window" />
+				            <menulist id="targetWin" oncommand="EJS_targetChanged(event.target);" tabindex="1" flex="1">
+				            	<menupopup id="window-menu" datasources="rdf:window-mediator"
+				            		ref="NC:WindowMediatorRoot">
+				            		<template>
+				            			<rule>
+				            				<menuitem uri="rdf:*" label="rdf:http://home.netscape.com/NC-rdf#Name" />
+				            			</rule>
+				            		</template>
+				            	</menupopup>
+				            </menulist>
+                		</hbox>
+                    </row>
+                    <row style="height:21px;">
                         <label value="JS-Code to execute" accesskey="j" control="jsCode" width="300" style="margin-bottom:5px"/>            
                     </row>
                     <row  flex="1">
                         <vbox flex="10">
-                            <textbox id="jsCode" multiline="true" flex="1" tabindex="5">
-                            	Enter the JavaScript code and press 'Execute' or
-                            	'Properties'.&#13;Ctrl+Up/Down for scrolling in command
-                            	history&#13;The following shortcut-notations are available:&#13;cw
-                            	--> getBrowser().contentWindow&#13;doc --> document&#13;getbyid -->
-                            	document.getElementById&#13;wo --> wrappedJSObject&#13;Two other
-                            	functions are available: print(Object) --> prints Object.toString()
-                            	to the result and props(Object) prints all the properties of the
-                            	object to the result box
-                            </textbox>
+                            <textbox id="jsCode" multiline="true" flex="1" tabindex="5"/>
                             <hbox align="right">
                                 <button label="Execute" accesskey="e" oncommand="EJS_executeJS()" tabindex="6" ></button>
                                 <button label="Properties" accesskey="p" oncommand="EJS_printProperties()"  tabindex="7"></button>
@@ -99,16 +87,36 @@
                     <column flex="1"/>
                 </columns>
                 <rows flex="1">
-                    <row align="center">
-                        <hbox align="center" flex="1" width="300">
-                            <label value="Function name" accesskey="f" control="functionName"></label>    
-                            <menulist id="functionName" editable="true" oncommand="EJS_searchFunctions()" flex="1" tabindex="15" onfocus="this.select()">
-  								<menupopup style="height:200px; max-height:200px">
-  								</menupopup>
-							</menulist>
-                            <button accesskey="a" label="Search"  oncommand="EJS_searchFunctions()" tabindex="16"/>
-                        </hbox>
-                    </row>
+                	<row>
+                	    <grid flex="1">
+                	        <columns>
+                	            <column/>
+                	            <column flex="1"/>
+                	            <column/>
+                	        </columns>
+                	        <rows>
+                	            <row align="center">
+			          	            <label control="targetObj" value="Target object" accesskey="o"/>
+						            <menulist id="targetObj" editable="true" oncommand="EJS_targetChanged(event.target);" tabindex="14" flex="1">
+						            	<menupopup> 
+						            		<menuitem label="Content Window" value="getBrowser().contentWindow.wrappedJSObject"/>
+						            	</menupopup>
+						            </menulist>
+                	              
+                	            </row>
+                	            <row align="center">
+		                            <label value="Function name" accesskey="f" control="functionName"></label>    
+		                            <menulist id="functionName" editable="true" oncommand="EJS_searchFunctions()" flex="1" tabindex="15" onfocus="this.select()">
+		  								<menupopup style="height:200px; max-height:200px">
+		  								</menupopup>
+									</menulist>
+		                            <button accesskey="a" label="Search"  oncommand="EJS_searchFunctions()" tabindex="16"/>
+                	            </row>
+                	        </rows>
+                	    </grid>
+                	    <hbox align="center" flex="1">
+                		</hbox>
+                	</row>
                     <row  flex="1">
                         <vbox >
                             <textbox id="functionCode" multiline="true" flex="1" tabindex="17" wrap="off" value="Enter a part of the function name in the searchfield and press enter &#13;or the search button.&#13;After editing the function body, you can save the modified function."></textbox>
