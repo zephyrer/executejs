@@ -38,8 +38,8 @@
         buttons="accept,cancel"
         >
 
-    <script type="application/x-javascript" src="chrome://executejs/content/common/common.js"/>
     <script type="application/x-javascript" src="chrome://executejs/content/executejs/ejs_common.js"/>
+    <script type="application/x-javascript" src="chrome://executejs/content/common/constants.js"/>
     <script type="application/x-javascript" src="chrome://executejs/content/executejs/ejs_prefs.js"/>
     
     <dialogheader id="header" title="Execute JS 0.2"/>

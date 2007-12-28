@@ -59,7 +59,6 @@ function EJS_initShortCuts(){
 	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_UP, ShortCutManager.CTRL, "EJS_previousCommandFromHistory()");
 	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_SPACE, ShortCutManager.CTRL_SHIFT, "EJS_commandAbbreviations()");
 	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_SPACE, ShortCutManager.CTRL, "EJS_codeCompletion()");
-	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_DOWN, ShortCutManager.NONE, "EJS_contextMnuDown()");
 	ShortCutManager.addJsShortCutForElement("functionName", 13, ShortCutManager.NONE, "EJS_searchFunctions()");
 }
 
@@ -83,7 +82,7 @@ function EJS_initCommandAbbrs(){
 		EJS_pupCommandAbbr.removeChild(EJS_pupCommandAbbr.firstChild)
 	}
 	EJS_commandAbbrs = new Object()
-	var commandAbbrs = rno_common.Prefs.getPrefsForListbox(EJS_PREF_COMMAND_ABBR)
+	var commandAbbrs = rno_common.Prefs.getPrefsForListbox(executejs.EjsCommon.EJS_PREF_COMMAND_ABBR)
 	for(var i=0; i<commandAbbrs.length; i++) {
 		//add menuitem
 		var commandAbbrEntry = commandAbbrs[i]
@@ -100,7 +99,7 @@ function EJS_initCommandAbbrs(){
 
 function EJS_initObserver(){
 	EJS_prefObserver = rno_common.Utils.createObserver(EJS_initAfterPrefChange);
-	rno_common.Utils.registerObserver(EJS_PREF_OBSERVER, EJS_prefObserver)
+	rno_common.Utils.registerObserver(executejs.EjsCommon.EJS_PREF_OBSERVER, EJS_prefObserver)
 }
 
 function EJS_targetWinChanged(){
@@ -121,10 +120,12 @@ function EJS_targetObjChanged() {
 	//Check whether object valid
 	var objString = EJS_cntTargetObjectTB.value
 	EJS_cntTargetObjectTB.inputField.style.backgroundColor=""
+	EJS_currentTargetObj = null
 	if(objString.length>0){
 		try {
 			EJS_currentTargetObj = EJS_evalStringOnTarget(EJS_cntTargetObjectTB.value)
-		}catch(e){
+		}catch(e){}
+		if(EJS_currentTargetObj==null){
 			EJS_currentTargetObj=null
 			EJS_cntTargetObjectTB.inputField.style.backgroundColor="#FF5F3F"
 		}
@@ -269,8 +270,7 @@ function EJS_previousCommandFromHistory(){
 }
 
 function EJS_createMenuItem(id, aLabel, value) {
-  const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-  var item = document.createElementNS(XUL_NS, "menuitem"); // create a new XUL menuitem
+  var item = document.createElementNS(rno_common.Constants.XUL_NS, "menuitem"); // create a new XUL menuitem
   item.setAttribute("label", aLabel);
   item.setAttribute("value", value);
   item.setAttribute("id", id);
@@ -315,7 +315,7 @@ function EJS_searchFunctions(){
 }
 
 function EJS_doOnUnload(){
-	var maxHistSize = rno_common.Prefs.getCharPref(EJS_PREF_MAX_HIST_PERS_SIZE)
+	var maxHistSize = rno_common.Prefs.getCharPref(executejs.EjsCommon.EJS_PREF_MAX_HIST_PERS_SIZE)
 	var startIndex = Math.max(0, EJS_commandHistory.length-maxHistSize)
 	EJS_commandHistory = EJS_commandHistory.slice(startIndex)
 	executejs.ConfigManager.saveHistory(EJS_commandHistory);
@@ -405,13 +405,13 @@ function EJS_codeCompletion(){
 }
 
 function EJS_openConfig(){
-	openDialog(EJS_CHROME_URL+"prefs.xul", "prefs", "chrome, modal, centerscreen")
+	openDialog(executejs.EjsCommon.EJS_CHROME_URL+"prefs.xul", "prefs", "chrome, modal, centerscreen")
 }
 
 //Reopen win for debug purposes
 function EJS_ReopenWin(){
 	window.close()
-	window.opener.open(EJS_CHROME_URL+"executeJS.xul","commandwin", "chrome,width=850,height=450,resizable");
+	window.opener.open(executejs.EjsCommon.EJS_CHROME_URL+"executeJS.xul","commandwin", "chrome,width=850,height=450,resizable");
 }
 
 //Reopen win for debug purposes
@@ -421,4 +421,10 @@ function EJS_ReloadScripts(){
 
 function EJS_initAfterPrefChange(){
 	EJS_initCommandAbbrs();
+}
+
+function EJS_openHelp(event){
+	var browser = window.opener.getBrowser()
+	browser.selectedTab = browser.addTab("http://www.mouseless.de/index.php?/content/view/18/31/")
+	window.opener.focus()		
 }

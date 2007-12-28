@@ -29,13 +29,14 @@ window.addEventListener('load',  EJS_onInit, false);
 function EJS_onInit() {
     //Add preferences-observer
     EJS_prefObserver = rno_common.Utils.createObserver(EJS_init);
-    rno_common.Utils.registerObserver(EJS_PREF_OBSERVER, EJS_prefObserver);
+    rno_common.Utils.registerObserver(executejs.EjsCommon.EJS_PREF_OBSERVER, EJS_prefObserver);
 	EJS_combinedShortCutCode = rno_common.Prefs.getCharPref(EJS_userPrefShortCutOpenCommandWin);
     EJS_init();
 }
 
 function EJS_openCommandWin(){
-    window.open("chrome://executejs/content/executejs/executeJS.xul","commandwin", "chrome,width=850,height=450,resizable");    
+    var win = window.open("chrome://executejs/content/executejs/executeJS.xul","commandwin", "chrome,width=850,height=450,resizable");
+    win.focus()    
 }
 
 function EJS_init(){

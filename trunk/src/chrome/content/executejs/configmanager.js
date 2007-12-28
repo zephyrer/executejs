@@ -31,7 +31,7 @@
 		},
 		
 		getConfigFile: function(){
-			var nslConfigFile = Utils.getInstallLocation(EJS_GUIID);
+			var nslConfigFile = Utils.getInstallLocation(executejs.EjsCommon.EJS_GUIID);
 			nslConfigFile.append(this.CONFIG_FILE_NAME)
 			var configFile = FileIO.open(nslConfigFile.path);
 			if(!configFile){
@@ -47,5 +47,5 @@
 		}
 	}
 	
-	NS.bindToNamespace(EJS_NS, "ConfigManager", ConfigManager);
+	NS.bindToNamespace("executejs", "ConfigManager", ConfigManager);
 })();
