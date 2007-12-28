@@ -1,3 +1,6 @@
+/**
+ * Keycode Mapper for ShortcutManager
+ */
 keyCodeMapper=new Object();
 keyCodeMapper['3']='CANCEL'
 keyCodeMapper['6']='HELP'

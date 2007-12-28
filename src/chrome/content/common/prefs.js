@@ -3,22 +3,21 @@
   Common-Prefs
   Version 0.1
   Created by Rudolf Noé
-  01.12.2005
+  28.12.2007
   
-  Borrowed from pref-tabprefs.js (c) Bradley Chapman (THANKS!)
+  Partly copied from pref-tabprefs.js (c) Bradley Chapman (THANKS!)
 */
 (function(){
-	//constants
-	const PREF_ID_ATTR = "prefid"
+	//Attribute of a control under which key the preference should be stored
+	PREF_ID_ATTR = "prefid"
 	
 	var Prefs = {
-		/***** Preference Dialog Functions *****/
+		VERSION: "0.1",
+		
+		//Reference to pref-service
 		prefs: Components.classes["@mozilla.org/preferences-service;1"].
 		    getService(Components.interfaces.nsIPrefBranch),
 
-		prefService: Components.classes["@mozilla.org/preferences-service;1"].
-		    getService(Components.interfaces.nsIPrefService),
-		
 	    getCharPref: function(key){
 	        return this.prefs.getCharPref(key)
 	    },
@@ -34,11 +33,17 @@
 	    hasUserPref: function(key){
 	    	return this.prefs.prefHasUserValue(key);
 	   	},
+
 	   	setCharPref: function(key, value){
 	   		this.prefs.setCharPref(key, value);
 	   	},
 
+		/*
+		 * Loads all Prefs for the controls of a document
+		 * The controls to restored must be identified with the prefid-Attribute 
+		 */
 		loadPrefs: function(document){
+		        //Checkboxes
 		        var checkboxes = document.getElementsByTagName("checkbox");
 		        for (var i = 0; i < checkboxes.length; i++)
 		        {
@@ -47,6 +52,7 @@
 		            	continue
 		            checkbox.checked = this.prefs.getBoolPref(checkbox.getAttribute(PREF_ID_ATTR));
 		        }
+		        //Textboxes
 		        var textfields = document.getElementsByTagName("textbox");
 		        for (i = 0; i < textfields.length; i++)
 		        {
@@ -55,12 +61,14 @@
 		            	continue
 		            textfield.value = this.prefs.getCharPref(textfield.getAttribute(PREF_ID_ATTR));
 		        }
+		        //Keyinputboxes
 		        var keyinputboxes = document.getElementsByTagName("keyinputbox");
 		        for (i = 0; i < keyinputboxes.length; i++)
 		        {
 		            var keyinputbox = keyinputboxes.item(i);
 		            keyinputbox.combinedValue = this.prefs.getCharPref(keyinputbox.getAttribute(PREF_ID_ATTR));
 		        }
+		        //Selectboxes
 		        var selectboxes = document.getElementsByTagName("select");
 		        for (i = 0; i < selectboxes.length; i++)
 		        {
@@ -75,36 +83,32 @@
 		                }
 		            }
 		        }
-       
+       			
+       			//Listboxes
+       			//In case of Listboxes the complete XML of the listbox is stored
 				var xmlParser = new DOMParser()
 		        var listboxes = document.getElementsByTagName("listbox")
 		        for(var i=0; i<listboxes.length; i++) {
 		        	var listbox = listboxes[i]
 		        	if(!listbox.hasAttribute(PREF_ID_ATTR))
 		        		continue
-//		        	var prefList = this.readPrefList(listbox.getAttribute(PREF_ID_ATTR))
-//		        	for(var j=0; j<prefList.length; j++) {
-//		        		listbox.appendItem(prefList[j], prefList[j])
-//		        	}
 					var listboxXml = this.prefs.getCharPref(listbox.getAttribute(PREF_ID_ATTR))
 					if(listboxXml=="")
 						continue;
 					var prefListbox = xmlParser.parseFromString(listboxXml, "text/xml")
 					listbox.parentNode.replaceChild(prefListbox.documentElement, listbox);
-//					var listitems = prefListbox.getElementsByTagName("listitem")
-//					while(listitems.length!=0){
-//						var prefListitem = listitems.item(j)
-//						prefListitem.parentNode.removeChild(prefListitem)
-//						var itemToAppend = document.importNode(prefListitem, true)
-//						listbox.appendChild(itemToAppend)
-//					}
 		        }		        
 		
 		},
 		
+		/*
+		 * Saves prefs for all controls of an document
+		 * The constrols for which prefs should be stored must have the prefid-attribute
+		 */
 		savePrefs: function(document){
-		    var checkboxes = document.getElementsByTagName("checkbox");
 		    try{
+				//Checkboxes
+			    var checkboxes = document.getElementsByTagName("checkbox");
 		        for (var i = 0; i < checkboxes.length; i++)
 		        {
 		            var checkbox = checkboxes[i];
@@ -112,6 +116,7 @@
 		            	continue
 	            	this.prefs.setBoolPref(checkbox.getAttribute(PREF_ID_ATTR), checkbox.checked);
 		        }
+		        //Textboxes
 		        var textfields = document.getElementsByTagName("textbox");
 		        for (i = 0; i < textfields.length; i++)
 		        {
@@ -120,12 +125,14 @@
 		            	continue
 		            this.prefs.setCharPref(textfield.getAttribute(PREF_ID_ATTR), textfield.value);
 		        }
+		        //Keyinputboxes
 		        var keyinputboxes = document.getElementsByTagName("keyinputbox");
 		        for (i = 0; i < keyinputboxes.length; i++)
 		        {
 		            var keyinputbox = keyinputboxes[i];
 		            this.prefs.setCharPref(keyinputbox.getAttribute(PREF_ID_ATTR), keyinputbox.combinedValue);
 		        }
+		        //Selectboxes
 		        var selectboxes = document.getElementsByTagName("select");
 		        for (i = 0; i < selectboxes.length; i++)
 		        {
@@ -134,13 +141,15 @@
 		            	continue
 	            	this.prefs.setCharPref(selectbox.getAttribute(PREF_ID_ATTR), selectbox.value);
 		        }
-		        
+		        //Listboxes
+		        //In case of Listboxes the complete XML of the listbox is stored
 		        var listboxes = document.getElementsByTagName("listbox")
 		        for(var i=0; i<listboxes.length; i++) {
 		        	var listbox = listboxes[i]
 		        	if(!listbox.hasAttribute(PREF_ID_ATTR))
 		        		continue
-					//Strip attributes
+					//Before serilization unneccessary attributes must be stripped
+					//as these would cause errors after parsing 
 		        	var listitems = listbox.getElementsByTagName("listitem")
 					for(var j=0; j<listitems.length; j++) {
 						var item = listitems.item(j)
@@ -161,16 +170,16 @@
 		    }
 		},
 		
-		savePrefList: function(key, valuearray){
-			var branch = this.prefs.deleteBranch(key);
-			for(var i=0; i<valuearray.length; i++){
-				var numberedKey = key+i
-				this.prefs.setCharPref(numberedKey, valuearray[i])
-			}
-		},
-		
-		getPrefsForListbox: function(key){
-			var listboxXml = this.prefs.getCharPref(key)
+		/*
+		 * Returns the preferences wich are stored as a listbox
+		 * @param prefid of the listbox
+		 * @returns 2-dim array; the first dim represents the number of entries in the listbox;
+		 *  		the second dim includes either only on entry (result[i][0]) with listitem.value
+		 * 			in case the listbox has only one column or one entry per listcell with their
+		 * 			respective value
+		 */
+		getPrefsForListbox: function(prefid){
+			var listboxXml = this.prefs.getCharPref(prefid)
 			var listbox = rno_common.XMLUtils.parseFromString(listboxXml, "text/xml")
 			var result = new Array()
 			var listitems = listbox.getElementsByTagName("listitem")
@@ -191,11 +200,6 @@
 			return result
 		},
 		
-		notifyObservers: function(observerName){
-		    var observerService = Components.classes["@mozilla.org/observer-service;1"].
-		        getService(Components.interfaces.nsIObserverService);
-		    observerService.notifyObservers ( null , observerName , null);
-		}
 	}
 	var Namespace = rno_common.Namespace;
 	Namespace.bindToNamespace(Namespace.COMMON_NS, "Prefs", Prefs);
