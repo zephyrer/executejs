@@ -18,7 +18,7 @@ function doOnload(){
 
 function saveUserPrefs(){
 	rno_common.Prefs.savePrefs(document);
-	rno_common.Prefs.notifyObservers(EJS_PREF_OBSERVER);
+	rno_common.Utils.notifyObservers(executejs.EjsCommon.EJS_PREF_OBSERVER);
 }
 
 function EJS_applyCommandAbbr(){
@@ -30,7 +30,7 @@ function EJS_applyCommandAbbr(){
 	var newListitem = null;
 	for(var i=0; i<items.length; i++) {
 		var listitem = items.item(i)
-		if(listitem.commandAbbr==commandAbbr){
+		if(listitem.firstChild.getAttribute("value")==commandAbbr){
 			newListitem=listitem
 			break;
 		}
@@ -38,10 +38,10 @@ function EJS_applyCommandAbbr(){
 	if(newListitem==null){
 		var newListitem = Listbox.appendMultiColumnItem(commandAbbrLB, [commandAbbr, command], 
 			[commandAbbr, command])
-		newListitem.commandAbbr=commandAbbr
 	}else{
 		var commandListcell = newListitem.childNodes.item(1)
 		commandListcell.setAttribute("label", command)
+		commandListcell.setAttribute("value", command)
 	}
 }
 
@@ -83,6 +83,9 @@ function EJS_move(direction){
 function EJS_commandAbbrSelChanged(){
 	var commandAbbrLB = byId("commandAbbrLB")
 	var selItem = commandAbbrLB.selectedItem
+	if(selItem==null){
+		return
+	}
 	var abbr = selItem.firstChild.getAttribute("value");
 	byId("commandAbbrTB").value=abbr
 	var command = selItem.childNodes.item(1).getAttribute("value")

@@ -14,14 +14,13 @@
     onunload="EJS_doOnUnload()"
     sizemode="maximized"
     >
-    <script type="application/x-javascript" src="chrome://executejs/content/common/common.js"/>
     <script type="application/x-javascript" src="chrome://executejs/content/executejs/ejs_common.js"/>
+    <script type="application/x-javascript" src="chrome://executejs/content/common/constants.js"/>
     <script type="application/x-javascript" src="chrome://executejs/content/executejs/executeJS.js"/>
     <script type="application/x-javascript" src="chrome://executejs/content/executejs/shortcutmanager_firefox.js"/>
 
 	<keyset>
 		<key keycode="VK_F5" oncommand="EJS_ReopenWin()"/>
-		<key modifiers="control" keycode="VK_F5" oncommand="EJS_ReloadScripts()"/>
 	</keyset>
 	
     <popupset>
@@ -33,9 +32,10 @@
         <menubar id="sample-menubar">
           <menu id="file-menu" label="Execute JS" accesskey="x">
             <menupopup id="file-popup">
-              <menuitem label="Configuration" oncommand="EJS_openConfig()"/>
+              <menuitem label="Configuration" oncommand="EJS_openConfig()" accesskey="c"/>
+              <menuitem label="Help" oncommand="EJS_openHelp(event)" accesskey="h"/>
               <menuseparator/>
-              <menuitem label="Exit" oncommand="window.close()"/>
+              <menuitem label="Exit" oncommand="window.close()" accesskey="x"/>
             </menupopup>
           </menu>
         </menubar>
@@ -48,7 +48,7 @@
                     <row align="end" height="30px">
                 		<hbox align="center">
 				            <label control="targetWin" accesskey="w" value="Target window" />
-				            <menulist id="targetWin" oncommand="EJS_targetWinChanged(event.target);" tabindex="1" flex="1">
+				            <menulist id="targetWin" oncommand="EJS_targetWinChanged(event.target);" tabindex="1" maxwidth="300px" minwidth="100px">
 				            	<menupopup id="window-menu" datasources="rdf:window-mediator"
 				            		ref="NC:WindowMediatorRoot">
 				            		<template>
@@ -67,18 +67,18 @@
                     </row>
                     <row  flex="1">
                         <vbox flex="10">
-                            <textbox id="jsCode" multiline="true" flex="1" tabindex="5"/>
+                            <textbox id="jsCode" multiline="true" flex="1" tabindex="3"/>
                             <hbox align="right">
-                                <button label="Execute" accesskey="e" oncommand="EJS_executeJS()" tabindex="6" ></button>
-                                <button label="Properties" accesskey="p" oncommand="EJS_printProperties()"  tabindex="7"></button>
+                                <button label="Execute" accesskey="e" oncommand="EJS_executeJS()" tabindex="4" ></button>
+                                <button label="Properties" accesskey="p" oncommand="EJS_printProperties()"  tabindex="5"></button>
                             </hbox>
                             <label>Result</label>
-                            <textbox id="result" multiline="true" flex="2" tabindex="10"></textbox>
+                            <textbox id="result" multiline="true" flex="2" tabindex="7"></textbox>
                         </vbox>
                     </row>
                     <row>
                         <hbox align="right">
-                            <button label="Clear" accesskey="r" oncommand="EJS_clearResult()" tabindex="11"></button>
+                            <button label="Clear" accesskey="r" oncommand="EJS_clearResult()" tabindex="8"></button>
                         </hbox>
                     </row>
                 </rows>
@@ -99,30 +99,27 @@
                 	        <rows>
                 	            <row align="center">
 			          	            <label control="targetObj" value="Target object" accesskey="o"/>
-			          	            <textbox id="targetObj" onchange="EJS_targetObjChanged()" tabindex="14" flex="1"/>
+			          	            <textbox id="targetObj" onchange="EJS_targetObjChanged()" tabindex="9" flex="1"/>
                 	            </row>
                 	            <row align="center">
 		                            <label value="Function name" accesskey="f" control="functionName"></label>    
-		                            <menulist id="functionName" editable="true" oncommand="EJS_searchFunctions()" flex="1" tabindex="15" onfocus="this.select()">
+		                            <menulist id="functionName" editable="true" oncommand="EJS_searchFunctions()" flex="1" tabindex="10" onfocus="this.select()">
 		  								<menupopup style="height:200px; max-height:200px">
 		  								</menupopup>
 									</menulist>
-		                            <button accesskey="a" label="Search"  oncommand="EJS_searchFunctions()" tabindex="16"/>
+		                            <button accesskey="a" label="Search"  oncommand="EJS_searchFunctions()" tabindex="11"/>
                 	            </row>
                 	        </rows>
                 	    </grid>
-                	    <hbox align="center" flex="1">
-                		</hbox>
                 	</row>
                     <row  flex="1">
                         <vbox >
-                            <textbox id="functionCode" multiline="true" flex="1" tabindex="17" wrap="off" value="Enter a part of the function name in the searchfield and press enter &#13;or the search button.&#13;After editing the function body, you can save the modified function."></textbox>
+                            <textbox id="functionCode" multiline="true" flex="1" tabindex="12" wrap="off" value="Enter a part of the function name in the searchfield and press enter &#13;or the search button.&#13;After editing the function body, you can save the modified function."></textbox>
                         </vbox>
                     </row>
                     <row>
                         <hbox align="right">
-                            <button label="Save" accesskey="s" oncommand="EJS_saveFunction()" tabindex="18"></button>
-                            <button label="Close Window" accesskey="c" oncommand="window.close()" tabindex="19"></button>
+                            <button label="Save" accesskey="s" oncommand="EJS_saveFunction()" tabindex="13"></button>
                         </hbox>
                     </row>
                 </rows>
