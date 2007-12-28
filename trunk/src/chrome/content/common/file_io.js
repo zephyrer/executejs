@@ -18,7 +18,7 @@
 	// }
 
 	var FileIO = {
-
+		VERSION: "0.1",
 		localfileCID  : '@mozilla.org/file/local;1',
 		localfileIID  : Components.interfaces.nsILocalFile,
 
