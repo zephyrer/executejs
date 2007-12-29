@@ -6,14 +6,13 @@
 <property name="build_dir" location="./build" />
 <property name="dist_dir" location="./dist" />
 <property name="backup_dir" location="./backup" />
+<property name="version" value="0_2"/>
 
-<target name="createDistributionXPI" >
+<target name="createDistributionXPI">
     <delete>
         <fileset dir="${dist_dir}" includes="*"/>
     </delete>
-    <zip destfile="./dist/${ant.project.name}.xpi" update="true">
-    	<zipfileset dir="${src_dir}" defaultexcludes="yes"/>
-    </zip>
+    <zip destfile="./dist/${ant.project.name}_${version}.xpi" update="true" basedir="${src_dir}" includes="**"/>
     <!-- Make backup-copy -->
     <copy todir="${backup_dir}/src">
 		<fileset dir="${src_dir}"/>
