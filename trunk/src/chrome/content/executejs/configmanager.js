@@ -4,7 +4,7 @@
 	var Utils = rno_common.Utils
 	
 	var ConfigManager = {
-		CONFIG_FILE_NAME: "ejs_history.xml",
+		CONFIG_FILE_NAME: "executejs_history.xml",
 		
 		readHistory: function(){
 			var configFile = this.getConfigFile();
