@@ -96,7 +96,8 @@
 					if(listboxXml=="")
 						continue;
 					var prefListbox = xmlParser.parseFromString(listboxXml, "text/xml")
-					listbox.parentNode.replaceChild(prefListbox.documentElement, listbox);
+					var newListbox = document.importNode(prefListbox.documentElement, true)
+					listbox.parentNode.replaceChild(newListbox, listbox);
 		        }		        
 		
 		},
