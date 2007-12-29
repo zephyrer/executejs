@@ -1,2 +1,2 @@
-cd /d "E:\Programmierung\www\mozilla\extensions\executeJS"
+cd /d "H:\Programmierung\Mozilla\extensions\executejs"
 ant
