@@ -177,6 +177,7 @@ function EJS_evalStringOnTarget(string){
 	var contentWin = null
 	if(EJS_cntContentWinCB.checked==true && EJS_cntContentWinCB.disabled==false){
 		contentWin = EJS_currentTargetWin.getBrowser().contentWindow.wrappedJSObject
+		//return EJS_currentTargetWin.getBrowser().contentWindow.wrappedJSObject.eval(string)
 	}
 	return EJS_currentTargetWin.eval(EJS_replaceShortcuts(string), contentWin)	
 }
