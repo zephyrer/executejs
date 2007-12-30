@@ -9,7 +9,7 @@
 (function(){
 	var Constants = rno_common.Constants
 	var Listbox = {
-		VERSION: "0.1",
+		VERSION: "0.2",
 		
 		/* 
 		 * Returns NodeList of listitems of a listbox

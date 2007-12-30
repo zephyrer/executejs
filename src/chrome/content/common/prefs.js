@@ -12,7 +12,7 @@
 	PREF_ID_ATTR = "prefid"
 	
 	var Prefs = {
-		VERSION: "0.1",
+		VERSION: "0.2",
 		
 		//Reference to pref-service
 		prefs: Components.classes["@mozilla.org/preferences-service;1"].

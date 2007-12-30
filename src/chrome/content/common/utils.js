@@ -3,7 +3,7 @@
  */
 (function(){
 	var Utils = {
-		VERSION: "0.1",
+		VERSION: "0.2",
 	
 		/*
 		 * Logs message to Console services
