@@ -8,7 +8,7 @@
 
 (function(){
 	var XMLUtils = {
-		VERSION: "0.1",
+		VERSION: "0.2",
 		
 		/*
 		 * Parses an xmlString and returns and XML-Object not an DOM-Node!!!
