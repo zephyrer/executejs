@@ -154,7 +154,7 @@ function ShortCut_onEvent(event){
     }catch(e){}
     if(ShortCutManager.SUPPRESS_KEY==result){
 	    event.preventDefault();
-    	event.stopPropagation();
+    	 event.stopPropagation();
     }
 }
 ShortCut.prototype.onEvent = ShortCut_onEvent;

@@ -32,11 +32,24 @@
 	
 	    hasUserPref: function(key){
 	    	return this.prefs.prefHasUserValue(key);
-	   	},
+	   },
 
-	   	setCharPref: function(key, value){
-	   		this.prefs.setCharPref(key, value);
-	   	},
+	   setCharPref: function(key, value){
+	   	this.prefs.setCharPref(key, value);
+	   },
+
+	   setBoolPref: function(key, value){
+	   	this.prefs.setBoolPref(key, value);
+	   },
+	   
+	   /*
+	    * Returns pref branch
+	    * @param: branchKey (e.g. "executejs.")
+	    * @returns 
+	    */
+	   getBranch: function(branchKey){
+	     return this.prefs.getBranch(branchKey) 
+	   },
 
 		/*
 		 * Loads all Prefs for the controls of a document
