@@ -98,6 +98,24 @@
 		    return observer;
 		},
 		
+		createObserverForInterface: function(nsIObserver){
+         var observer = {
+         	nsIObserver: nsIObserver,
+	    	   QueryInterface: function(iid) {
+					if (!iid.equals(Components.interfaces.nsISupports)
+							&& !iid.equals(Components.interfaces.nsISupportsWeakReference)
+							&& !iid.equals(Components.interfaces.nsIObserver)) {
+						throw Components.results.NS_ERROR_NO_INTERFACE; }
+					return this;
+	    	   },
+	    	   
+	    	   observe: function(){
+	    	   	nsIObserver.observe();
+	    	   }
+	     }
+	     return observer;
+		},
+		
 		/*
 		 * Notifies all observers listen to the provided observerId
 		 * @param observerId
@@ -106,7 +124,24 @@
 		    var observerService = Components.classes["@mozilla.org/observer-service;1"].
 		        getService(Components.interfaces.nsIObserverService);
 		    observerService.notifyObservers ( null , observerId , null);
-		}
+		},
+		
+		/*
+		 * Determines nsIUpdateItem for a extension
+		 * @param: guiId of the extension
+		 * @return: nsIUpdateItem 
+		 */
+		 getExtension: function(guiId){
+		    var em = Components.classes["@mozilla.org/extensions/manager;1"].
+		       getService( Components.interfaces.nsIExtensionManager)
+          return em.getItemForID(guiId)
+		 },
+		 
+		 getMostRecentBrowserWin: function(){
+		    var wm = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+                   .getService(Components.interfaces.nsIWindowMediator);
+          return wm.getMostRecentWindow("navigator:browser");	
+		 }
 		
 	}
 	
