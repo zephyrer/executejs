@@ -174,12 +174,14 @@ function EJS_executeJS(){
 }
 
 function EJS_evalStringOnTarget(string){
+	var evalString = EJS_replaceShortcuts(string);
 	var contentWin = null
 	if(EJS_cntContentWinCB.checked==true && EJS_cntContentWinCB.disabled==false){
 		contentWin = EJS_currentTargetWin.getBrowser().contentWindow.wrappedJSObject
-		//return EJS_currentTargetWin.getBrowser().contentWindow.wrappedJSObject.eval(string)
-	}
-	return EJS_currentTargetWin.eval(EJS_replaceShortcuts(string), contentWin)	
+		return contentWin.eval(evalString, contentWin)
+	}else{
+      return EJS_currentTargetWin.eval(evalString)
+	}	
 }
 
 function EJS_replaceShortcuts(code){
