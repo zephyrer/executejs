@@ -9,6 +9,7 @@
 (function(){
 	var XMLUtils = {
 		VERSION: "0.2",
+		NON_WHITE_SPACE_REGEX: /[^\s]/,
 		
 		/*
 		 * Parses an xmlString and returns and XML-Object not an DOM-Node!!!
@@ -42,16 +43,23 @@
 	    },
 	    
 	    /*
-	     * Checks whether a text node is empty
+	     * Checks whether a text node is empty or contains at least only withespace characters
 	     * @param element: DOM-Node
 	     */
 	    isEmptyTextNode: function(element){
-	        if(element.nodeType==Node.TEXT_NODE && element.nodeValue=="")
+	        if(element.nodeType==Node.TEXT_NODE && element.nodeValue!=null && !this.NON_WHITE_SPACE_REGEX.test(element.nodeValue))
 	            return true
 	        else
 	            return false;
 	    },
-		
+	    
+	    containsNoText:function(element){
+         if(this.NON_WHITE_SPACE_REGEX.test(element.text)){
+         	return false
+         }else{
+         	return true
+         }
+	    },
 	}
 	var NS = rno_common.Namespace
 	NS.bindToNamespace(NS.COMMON_NS, "XMLUtils", XMLUtils);
