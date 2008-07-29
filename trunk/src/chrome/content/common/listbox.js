@@ -20,6 +20,14 @@
 			return listbox.getElementsByTagName("listitem");
 		},
 		
+		getSelectedListCells: function(listbox){
+			if(listbox.selectedIndex==-1){
+				return null;
+			}
+			var selectedItem = listbox.getItemAtIndex(listbox.selectedIndex)
+			return selectedItem.getElementsByTagName('listcell')
+		},
+		
 		/*
 		 * Appends a row to a mulicolumn listbox
 		 * @param listbox: listbox object
@@ -27,7 +35,7 @@
 		 * @Param valueArray (mand): array of values, for each column one entry
 		 * @param listItemValue (option): value of the newly created listitem
 		 */
-		appendMultiColumnItem: function(listbox, labelArray, valueArray, listItemValue){
+		appendMultiColumnItem: function(listbox, labelArray, valueArray, listItemValue, styleArray){
 			if(labelArray.length!=valueArray.length)
 				throw new Error("Listbox.appendMultiColumnItem: labelArray and valueArray do not have the sam length")
 			var newItem = document.createElementNS(Constants.XUL_NS, "listitem");
@@ -38,11 +46,35 @@
 				var listcell = document.createElementNS(Constants.XUL_NS, "listcell")
 				listcell.setAttribute("label", labelArray[i])
 				listcell.setAttribute("value", valueArray[i])
+				if(styleArray!=null && styleArray[i]!=null){
+					listcell.style.cssText = styleArray[i]
+				}
 				newItem.appendChild(listcell)
 			}
 			listbox.appendChild(newItem)
 			return newItem
 		},		
+		
+		/**
+		 * Updates the selected row in the listbox
+		 */
+		updateSelectedRow: function(listbox, labelArray, valueArray){
+         if(labelArray.length!=valueArray.length)
+            throw new Error("Listbox.appendMultiColumnItem: labelArray and valueArray do not have the sam length")
+         var selectedItem = listbox.selectedItem
+         if(selectedItem==null){
+         	throw new Error("Listbox.updateMultiColumnItem: No item selected")
+         }
+         var listcells = selectedItem.getElementsByTagName("listcell")
+         if(labelArray.length!=listcells.length){
+         	throw new Error("Listbox.updateMultiColumnItem: labelArray.length is not equal to the number of listcells")
+         }
+         for(var i=0; i<listcells.length; i++){
+            listcells[i].setAttribute("label", labelArray[i])
+            listcells[i].setAttribute("value", valueArray[i])
+         }
+		},
+	
 	}
 	var NS = rno_common.Namespace;
 	NS.bindToNamespace(NS.COMMON_NS, "Listbox", Listbox);

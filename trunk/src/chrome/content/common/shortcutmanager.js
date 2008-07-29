@@ -78,7 +78,10 @@ function ShortCutManager_onEvent(event, elementId){
     if(shortCutArray){
         ShortCutManager.currentEvent = event;
         for(var i=0; i<shortCutArray.length; i++){
-            shortCutArray[i].onEvent(event);
+            var result = shortCutArray[i].onEvent(event);
+            if(result&ShortCutManager.PREVENT_FURTHER_EVENTS){
+            	break;
+            }
         }
     }else{
         ShortCutManager.currentEvent = null;
@@ -149,13 +152,12 @@ function ShortCut(jsCode, clientId){
 }
 
 function ShortCut_onEvent(event){
-    try{
-        var result = window.eval(this.jsCode);
-    }catch(e){}
-    if(ShortCutManager.SUPPRESS_KEY==result){
+    var result = window.eval(this.jsCode);
+    if(result&ShortCutManager.SUPPRESS_KEY){
 	    event.preventDefault();
     	 event.stopPropagation();
     }
+    return result
 }
 ShortCut.prototype.onEvent = ShortCut_onEvent;
 
@@ -165,4 +167,5 @@ ShortCutManager.CTRL = Event.CONTROL_MASK;
 ShortCutManager.SHIFT = Event.SHIFT_MASK;
 ShortCutManager.CTRL_SHIFT = Event.CONTROL_MASK | Event.SHIFT_MASK;
 ShortCutManager.ALT_SHIFT = Event.ALT_MASK | Event.SHIFT_MASK;
-ShortCutManager.SUPPRESS_KEY = "suppressKey";
+ShortCutManager.SUPPRESS_KEY = 1;
+ShortCutManager.PREVENT_FURTHER_EVENTS = 2
