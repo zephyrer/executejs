@@ -59,22 +59,29 @@
 		 * Updates the selected row in the listbox
 		 */
 		updateSelectedRow: function(listbox, labelArray, valueArray){
-         if(labelArray.length!=valueArray.length)
-            throw new Error("Listbox.appendMultiColumnItem: labelArray and valueArray do not have the sam length")
          var selectedItem = listbox.selectedItem
          if(selectedItem==null){
          	throw new Error("Listbox.updateMultiColumnItem: No item selected")
          }
-         var listcells = selectedItem.getElementsByTagName("listcell")
+         this.updateRow(listbox, selectedItem, labelArray, valueArray)
+		},
+		
+		updateRow: function(listbox, listItem, labelArray, valueArray){
+         if(labelArray.length!=valueArray.length)
+            throw new Error("Listbox.appendMultiColumnItem: labelArray and valueArray do not have the sam length")
+         var listcells = listItem.getElementsByTagName("listcell")
          if(labelArray.length!=listcells.length){
          	throw new Error("Listbox.updateMultiColumnItem: labelArray.length is not equal to the number of listcells")
          }
          for(var i=0; i<listcells.length; i++){
-            listcells[i].setAttribute("label", labelArray[i])
-            listcells[i].setAttribute("value", valueArray[i])
+            if(labelArray[i]!=null){
+               listcells[i].setAttribute("label", labelArray[i])
+            }
+            if(valueArray[i]!=null){
+               listcells[i].setAttribute("value", valueArray[i])
+            }
          }
-		},
-	
+		}
 	}
 	var NS = rno_common.Namespace;
 	NS.bindToNamespace(NS.COMMON_NS, "Listbox", Listbox);

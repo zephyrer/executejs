@@ -11,6 +11,10 @@
 	// Attribute of a control under which key the preference should be stored
 	PREF_ID_ATTR = "prefid"
 	
+	PREF_FUNCT_LOAD_ATTR = "prefLoadFunction"
+	
+	PREF_FUNCT_SAVE_ATTR = "prefSaveFunction"
+	
 	PrefTypes = {
 		CHAR: "CHAR",
 		BOOL: "BOOL"
@@ -63,6 +67,13 @@
 		 * restored must be identified with the prefid-Attribute
 		 */
 		loadPrefs : function(document) {
+			//Items with pref function
+			var prefFuncItems = document.getElementsByAttribute(PREF_FUNCT_LOAD_ATTR, "*")
+			for (var i = 0; i < prefFuncItems.length; i++) {
+				var functionName = prefFuncItems.item(i).getAttribute(PREF_FUNCT_LOAD_ATTR)
+				window[functionName]()
+			}
+			
 			// Checkboxes
 			this.loadPrefsForTagName("checkbox", PrefTypes.BOOL, "checked")
 
@@ -132,6 +143,13 @@
 		 */
 		savePrefs : function(document) {
 			try {
+            //Items with pref function
+            var prefFuncItems = document.getElementsByAttribute(PREF_FUNCT_SAVE_ATTR, "*")
+            for (var i = 0; i < prefFuncItems.length; i++) {
+               var functionName = prefFuncItems.item(i).getAttribute(PREF_FUNCT_SAVE_ATTR)
+               window[functionName]()
+            }
+
 				// Checkboxes
 				this.setPrefForTagName("checkbox", PrefTypes.BOOL, "checked");
 				

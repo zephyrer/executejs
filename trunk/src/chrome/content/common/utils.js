@@ -62,11 +62,34 @@
 				getService(Components.interfaces[interfaceName]);
 			
 		},
+		
+		/* 
+		 * Checks wether a certain extension is installed and enabled
+		 * @param guiId: GUI-Id of extension
+		 */
+		isExtensionInstalledAndEnabled : function(guiId) {
+			if (!Application.extensions.has(guiId)) {
+				return false
+			}
+			var rdfService = this.getService('@mozilla.org/rdf/rdf-service;1', 'nsIRDFService')
+			var extensionDatasource = this.getService('@mozilla.org/extensions/manager;1', 'nsIExtensionManager').datasource
+
+			var ext = rdfService.GetResource("urn:mozilla:item:" + guiId);
+			var userDisabled = rdfService.GetResource("http://www.mozilla.org/2004/em-rdf#userDisabled");
+			var appDisabled = rdfService.GetResource("http://www.mozilla.org/2004/em-rdf#appDisabled");
+
+			if (extensionDatasource.hasArcOut(ext, userDisabled, true)
+					|| extensionDatasource.hasArcOut(ext, appDisabled, true)) {
+				return false
+			} else {
+				return true
+			}
+		},
 
 		/*
-		 * Copies provided string to the clipboard where is it accessible for 
-		 * paste. It needs a short amount of time until the string is available in the clipboard
-		 * @param string: string which is copied to clipboard
+		 * Copies provided string to the clipboard where is it accessible for
+		 * paste. It needs a short amount of time until the string is available
+		 * in the clipboard @param string: string which is copied to clipboard
 		 */
 	    copyToClipboard: function(string){
 	    	var clipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"] 
@@ -160,9 +183,14 @@
       /*
        * Open Url in new Tab
        */
-      openUrlInNewTab: function(urlString){
+      openUrlInNewTab: function(urlString, focus){
          var uri = this.createURI(urlString)
-         return Application.activeWindow.open(uri);
+         var newTab = Application.activeWindow.open(uri);
+         if(focus){
+         	this.getMostRecentBrowserWin().focus()
+         	newTab.focus()
+         }
+         return newTab
       },
 
 		// Converts a pattern in this programs simple notation to a regular expression.

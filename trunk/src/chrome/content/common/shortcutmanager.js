@@ -143,6 +143,37 @@ function ShortCutManager_encodeEventModifier(event){
 }
 ShortCutManager.encodeEventModifier=ShortCutManager_encodeEventModifier;
 
+function ShortCutManager_getStringForCombinedKeyCode(combinedKeyCode) {
+	if (combinedKeyCode == "0") {
+		return null
+	} else {
+		var modifiers = combinedKeyCode & 0xF;
+		var arr = new Array();
+		if (modifiers & Event.CONTROL_MASK)
+			arr.push('Ctrl');
+		if (modifiers & Event.SHIFT_MASK)
+			arr.push('Shift');
+		if (modifiers & Event.ALT_MASK)
+			arr.push('Alt');
+		if (modifiers & Event.META_MASK)
+			arr.push('Meta');
+		var keyString = arr.join('+');
+		var keyCode = combinedKeyCode >> 4;
+		var charString = keyCode
+		for(key in KeyEvent){
+			if(KeyEvent[key]==keyCode){
+				charString = key.substring(7)
+				break
+			}
+		}
+		if(keyString!=""){
+			keyString = keyString + "+"
+		}
+		return keyString + charString
+	}
+}
+ShortCutManager.getStringForCombinedKeyCode=ShortCutManager_getStringForCombinedKeyCode
+
 /*
  * Construktor für Shortcut
  */
