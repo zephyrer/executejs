@@ -7,12 +7,12 @@
        <stylesheet src="common_bindings.css"/>
     </resources>
     <content>
-      <xul:textbox xbl:inherits="size" 
+      <xul:textbox xbl:inherits="size, context" 
                    readonly="true" 
                    class="keyinputbox" 
                    onkeydown="parentNode.onKeyDown(event);"
-                   onkeyup="parentNode.stopEvent(event);return false;"
-                   onkeypress="parentNode.stopEvent(event);return false;"
+                   onkeyup="//parentNode.stopEvent(event);return false;"
+                   onkeypress="//parentNode.stopEvent(event);return false;"
 		   onfocus="style.background='#faa';"
 		   onblur="style.background='#fff';"
 		   />
@@ -54,42 +54,27 @@
        
       <method name="updateDisplay">
         <body>
-          document.getAnonymousNodes(this)[0].value = this.keyString();
+          document.getAnonymousNodes(this)[0].value = this.getKeyString();
         </body>
       </method>
       
-      <!-- Returns a displayable representation of the keyCode and modifier values -->
-      <method name="keyString">
-        <body>
-          <![CDATA[
-            var str = '';
-            var parts;
-            var modifiers = this.getAttribute('modifiers');
-            var keyCode = this.getAttribute('keycode');
-            if (keyCode == '') return 'None';
-            str += (modifiers & Event.CONTROL_MASK)?'Ctrl+':'';
-            str += (modifiers & Event.ALT_MASK)?'Alt+':'';
-            str += (modifiers & Event.SHIFT_MASK)?'Shift+':'';
-            str += (modifiers & Event.META_MASK)?'Meta+':''; 
-            if(keyCodeMapper!=null)
-                return str + keyCodeMapper[keyCode];
-            // If no name is set, just use the keyCode
-            return str + keyCode;   
-          ]]>
-        </body>
+      <method name="getKeyString">
+      	<body>
+            return this.getStringForCombinedKeyCode(this.getCombinedValue())
+      	</body>
+      	
       </method>
-      
       <method name="onKeyDown">
         <parameter name="event"/>
         <body>
-          if (event.keyCode == Event.prototype.DOM_VK_META ||
-              event.keyCode == Event.prototype.DOM_VK_SHIFT ||
-              event.keyCode == Event.prototype.DOM_VK_CONTROL ||
-              event.keyCode == Event.prototype.DOM_VK_ALT ||
-              event.keyCode == KeyEvent.DOM_VK_TAB)
-              return;
-          this.setKey(event);
-          this.stopEvent(event);
+          <![CDATA[
+             var keyCode = event.keyCode
+             if (!event.ctrlKey && !event.altKey && !event.metaKey && event.keyCode==KeyEvent.DOM_VK_TAB){
+                 return;
+             }
+             this.setKey(event);
+             this.stopEvent(event);
+          ]]>
         </body>
       </method> 
     
@@ -105,14 +90,9 @@
       <method name="setKey">
         <parameter name="event"/>
         <body>
-          if(event.keyCode=="8"){
-            this.updateAttr('keycode',"");
-            this.updateAttr('modifiers',0);
-          }else{
-            this.updateAttr('keycode',event.keyCode);
-            this.updateAttr('modifiers',this.getModifiers(event));
-          }
-          this.updateDisplay();
+         this.updateAttr('keycode',event.keyCode);
+         this.updateAttr('modifiers',this.getModifiers(event));
+         this.updateDisplay();
         </body>
       </method>   
       
@@ -126,22 +106,6 @@
                  event.metaKey * Event.META_MASK;
         </body>
       </method> 
-      
-      <!-- Returns a string that can be used in the 'modifiers' attribute of the
-           XUL <key> element -->
-      <method name="getModifierString">
-        <body>
-          <![CDATA[
-            var arr = new Array();
-            var modifiers = this.getAttribute('modifiers');
-            if (modifiers & Event.CONTROL_MASK) arr.push('accel');
-            if (modifiers & Event.SHIFT_MASK) arr.push('shift');
-            if (modifiers & Event.ALT_MASK) arr.push('alt');
-            if (modifiers & Event.META_MASK) arr.push('meta');
-            return arr.join(',');
-          ]]>
-        </body>     
-      </method>
       
       <method name="setCombinedValue">
         <parameter name="value"/>
@@ -164,6 +128,13 @@
             return this.keyCode << 4 | this.modifiers;
           ]]>
         </body>
+      </method>
+      
+      <method name="getStringForCombinedKeyCode">
+      	<parameter name="combinedKeyCode"/>
+      	<body>
+      		return rno_common.KeyInputbox.getStringForCombinedKeyCode(combinedKeyCode)
+      	</body>
       </method>
     </implementation>
   </binding>
