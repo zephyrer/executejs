@@ -1,11 +1,11 @@
 (function() {
-
+   Utils = rno_common.Utils
 	var PrefUtils = {
 		HELP_ID_ATTR : "helpid",
 
 		initElementHelp : function(stringbundleId, descriptionTextboxId) {
 			var eventHandler = {
-				stringbundle: document.getElementById(stringbundleId),
+				stringbundleId: stringbundleId,
 				descriptionTB: document.getElementById(descriptionTextboxId),
 				handleEvent : function(event) {
 					target = document.commandDispatcher.focusedElement
@@ -44,13 +44,13 @@
                return null;
 				},
 				
-				getString: function(key){
+				getString: function(key, replaceParamsArray){
                try {
-                  var string = this.stringbundle.getString(key)
+               	var string = Utils.getString(stringbundleId, key, replaceParamsArray)
                } catch (e) {
                   return ""
                }
-               return string
+               return string==null?"":string
 				}
 			}
 			addEventListener("focus", eventHandler, true);

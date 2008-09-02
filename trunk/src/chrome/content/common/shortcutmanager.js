@@ -143,36 +143,18 @@ function ShortCutManager_encodeEventModifier(event){
 }
 ShortCutManager.encodeEventModifier=ShortCutManager_encodeEventModifier;
 
-function ShortCutManager_getStringForCombinedKeyCode(combinedKeyCode) {
-	if (combinedKeyCode == "0") {
-		return null
-	} else {
-		var modifiers = combinedKeyCode & 0xF;
-		var arr = new Array();
-		if (modifiers & Event.CONTROL_MASK)
-			arr.push('Ctrl');
-		if (modifiers & Event.SHIFT_MASK)
-			arr.push('Shift');
-		if (modifiers & Event.ALT_MASK)
-			arr.push('Alt');
-		if (modifiers & Event.META_MASK)
-			arr.push('Meta');
-		var keyString = arr.join('+');
-		var keyCode = combinedKeyCode >> 4;
-		var charString = keyCode
-		for(key in KeyEvent){
-			if(KeyEvent[key]==keyCode){
-				charString = key.substring(7)
-				break
-			}
-		}
-		if(keyString!=""){
-			keyString = keyString + "+"
-		}
-		return keyString + charString
-	}
+function ShortCutManager_isModifierCombination(event, modifierCombination){
+    return this.encodeEventModifier(event)==modifierCombination
 }
-ShortCutManager.getStringForCombinedKeyCode=ShortCutManager_getStringForCombinedKeyCode
+ShortCutManager.isModifierCombination=ShortCutManager_isModifierCombination;
+
+/*
+ * If applicable returns the label for an existing shortcut, if not it returns null
+ */
+function ShortCutManager_getLabelForExistingShortcut(combinedKeyCode){
+	//TODO implement this.
+}
+ShortCutManager.getLabelForExistingShortcut=ShortCutManager_getLabelForExistingShortcut;
 
 /*
  * Construktor für Shortcut
@@ -198,5 +180,6 @@ ShortCutManager.CTRL = Event.CONTROL_MASK;
 ShortCutManager.SHIFT = Event.SHIFT_MASK;
 ShortCutManager.CTRL_SHIFT = Event.CONTROL_MASK | Event.SHIFT_MASK;
 ShortCutManager.ALT_SHIFT = Event.ALT_MASK | Event.SHIFT_MASK;
+ShortCutManager.CTRL_ALT = Event.ALT_MASK | Event.CONTROL_MASK;
 ShortCutManager.SUPPRESS_KEY = 1;
 ShortCutManager.PREVENT_FURTHER_EVENTS = 2
