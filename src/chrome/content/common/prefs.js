@@ -26,6 +26,9 @@
 		// Reference to pref-service
 		prefs : Components.classes["@mozilla.org/preferences-service;1"]
 				.getService(Components.interfaces.nsIPrefBranch),
+	
+	   prefService : Components.classes["@mozilla.org/preferences-service;1"]
+				.getService(Components.interfaces.nsIPrefService),
 
 		getCharPref : function(key) {
 			return this.prefs.getCharPref(key)
@@ -54,12 +57,33 @@
 		clearUserPref : function(key) {
 			this.prefs.clearUserPref(key)
 		},
+		
+		/*
+		 * Resets prefs of branch
+		 * @param branchId: String identifying the branch
+		 * @param arrayWithExceptions: array with keys which should not be reset
+		 */
+		clearUserPrefForBranch: function(branchId, arrayWithException){
+			var exceptionKeys = new Object()
+			for (var i = 0; i < arrayWithException.length; i++) {
+				exceptionKeys[arrayWithException[i]]=""
+			}
+			var branch = this.getBranch(branchId)
+			var children = branch.getChildList("", {})
+			for (var i = 0; i < children.length; i++) {
+				var prefKey = branchId + children[i]
+				if(this.hasUserPref(prefKey) && exceptionKeys[prefKey]==null){
+					this.clearUserPref(prefKey)
+				}
+			}
+		},
 
 		/*
-		 * Returns pref branch @param: branchKey (e.g. "executejs.") @returns
+		 * Returns pref branch @param: branchKey (e.g. "executejs.") 
+		 * @returns
 		 */
 		getBranch : function(branchKey) {
-			return this.prefs.getBranch(branchKey)
+			return this.prefService.getBranch(branchKey)
 		},
 
 		/*

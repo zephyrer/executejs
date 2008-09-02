@@ -28,7 +28,7 @@
 		},
 		
 		logDebugMessage: function(messageString, debugPrefId){
-			if(Application.prefs.has(debugPrefId)){
+			if(Application.prefs.has(debugPrefId) && Application.prefs.get(debugPrefId).value==true){
 				this.logMessage(messageString)
 			}
 		},
@@ -193,7 +193,38 @@
          return newTab
       },
 
-		// Converts a pattern in this programs simple notation to a regular expression.
+		/*
+		 * Open Url in new window
+		 */
+      openInNewWindow: function(urlString, focus){
+         open(urlString)
+         if(focus){
+         	this.getMostRecentBrowserWin().focus()
+         }
+      },
+      
+      getString: function(stringBundleId, key, replaceParamArray){
+      	var stringbundle = document.getElementById(stringBundleId)
+      	try{
+      		if(replaceParamArray==null){
+      		   return stringbundle.getString(key)
+      		}else{
+      			return stringbundle.getFormattedString(key, replaceParamArray)
+      		}
+      	}catch(e){
+      		return null
+      	}
+      },
+      
+      observeObject: function(objectToObserve, propertyToObserve, callbackFunction){
+         objectToObserve.watch(propertyToObserve, function(prop, oldValue, newValue){
+           setTimeout(callbackFunction)
+           return newValue
+         })
+     },
+
+      
+      // Converts a pattern in this programs simple notation to a regular expression.
 		// thanks AdBlock! http://www.mozdev.org/source/browse/adblock/adblock/
 		convert2RegExp: function ( pattern ) {
 		  var s = new String(pattern);
