@@ -277,8 +277,7 @@
 		}
 	}
 	
-	var NS = rno_common.Namespace
-	NS.bindToNamespace(NS.COMMON_NS, "Utils", Utils);
+	DE_MOUSELESS_EXTENSION_NS["Utils"] = Utils;
 	
 })()
 

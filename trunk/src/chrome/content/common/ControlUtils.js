@@ -30,8 +30,5 @@
 			}
 		}
 	}
-
-	var Namespace = rno_common.Namespace;
-	Namespace
-			.bindToNamespace(Namespace.COMMON_NS, "ControlUtils", ControlUtils);
+	DE_MOUSELESS_EXTENSION_NS["ControlUtils"]= ControlUtils;
 })()

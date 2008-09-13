@@ -7,7 +7,7 @@
  * As the XBL-extension of listboxes is buggy this solution was choosen
  */
 (function(){
-	var Constants = rno_common.Constants
+	var Constants = DE_MOUSELESS_EXTENSION_NS.Constants
 	var Listbox = {
 		VERSION: "0.2",
 		
@@ -83,7 +83,6 @@
          }
 		}
 	}
-	var NS = rno_common.Namespace;
-	NS.bindToNamespace(NS.COMMON_NS, "Listbox", Listbox);
+	DE_MOUSELESS_EXTENSION_NS["Listbox"]= Listbox;
 	
 })()

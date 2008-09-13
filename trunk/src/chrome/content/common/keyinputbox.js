@@ -51,7 +51,6 @@
 			return arr.join('+');
 		}
 	}
-   var NS = rno_common.Namespace
-   NS.bindToNamespace(NS.COMMON_NS, "KeyInputbox", KeyInputbox)
+   DE_MOUSELESS_EXTENSION_NS["KeyInputbox"] = KeyInputbox
 })()
    
