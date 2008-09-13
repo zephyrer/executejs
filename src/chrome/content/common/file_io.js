@@ -317,5 +317,5 @@
 		DirIO.sep = '\\';
 	}
 
-	rno_common.Namespace.bindToNamespace(rno_common.Namespace.COMMON_NS, "FileIO", FileIO);
+	DE_MOUSELESS_EXTENSION_NS["FileIO"] = FileIO;
 })();

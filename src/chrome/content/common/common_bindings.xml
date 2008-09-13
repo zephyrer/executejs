@@ -133,7 +133,7 @@
       <method name="getStringForCombinedKeyCode">
       	<parameter name="combinedKeyCode"/>
       	<body>
-      		return rno_common.KeyInputbox.getStringForCombinedKeyCode(combinedKeyCode)
+      		return KeyInputbox.getStringForCombinedKeyCode(combinedKeyCode)
       	</body>
       </method>
     </implementation>

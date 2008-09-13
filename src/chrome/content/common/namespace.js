@@ -8,8 +8,10 @@
  */
 (function(){
 	var Namespace = {
-		VERSION: "0.1",
+		VERSION: "0.2",
+		//TODO: Remove in future versions if not used any more
 		COMMON_NS: "rno_common",
+		DEFAULT_COMMON_NS: "rno_common",
 		 
 		/*
 		 * Creates the neccessary namespace objects
@@ -48,6 +50,5 @@
 	    	}
 		}
 	}
-	
-	Namespace.bindToNamespace(Namespace.COMMON_NS, "Namespace", Namespace);
+	DE_MOUSELESS_EXTENSION_NS["Namespace"] = Namespace;	
 })()

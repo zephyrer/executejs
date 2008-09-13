@@ -1,5 +1,5 @@
 (function() {
-   Utils = rno_common.Utils
+   Utils = DE_MOUSELESS_EXTENSION_NS.Utils
 	var PrefUtils = {
 		HELP_ID_ATTR : "helpid",
 
@@ -58,6 +58,5 @@
 		}
 	}
 
-	var Namespace = rno_common.Namespace;
-	Namespace.bindToNamespace(Namespace.COMMON_NS, "PrefUtils", PrefUtils);
+	DE_MOUSELESS_EXTENSION_NS["PrefUtils"] = PrefUtils;
 })()

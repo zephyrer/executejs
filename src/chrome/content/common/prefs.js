@@ -6,7 +6,8 @@
  */
 (function() {
 	
-	var ControlUtils = rno_common.ControlUtils
+	var ControlUtils = DE_MOUSELESS_EXTENSION_NS.ControlUtils
+	var XMLUtils = DE_MOUSELESS_EXTENSION_NS.XMLUtils
 	
 	// Attribute of a control under which key the preference should be stored
 	PREF_ID_ATTR = "prefid"
@@ -212,7 +213,7 @@
 						item.setAttribute("label", attrLabel)
 						item.setAttribute("value", attrValue)
 					}
-					var xml = rno_common.XMLUtils.serializeToString(listbox);
+					var xml = XMLUtils.serializeToString(listbox);
 					this.prefs.setCharPref(listbox.getAttribute(PREF_ID_ATTR),
 							xml)
 				}
@@ -246,7 +247,7 @@
 		 */
 		getPrefsForListbox : function(prefid) {
 			var listboxXml = this.prefs.getCharPref(prefid)
-			var listbox = rno_common.XMLUtils.parseFromString(listboxXml,
+			var listbox = XMLUtils.parseFromString(listboxXml,
 					"text/xml")
 			var result = new Array()
 			var listitems = listbox.getElementsByTagName("listitem")
@@ -268,6 +269,5 @@
 			return result
 		}
 	}
-	var Namespace = rno_common.Namespace;
-	Namespace.bindToNamespace(Namespace.COMMON_NS, "Prefs", Prefs);
+	DE_MOUSELESS_EXTENSION_NS["Prefs"] = Prefs;
 })()

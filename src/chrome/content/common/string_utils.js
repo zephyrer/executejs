@@ -10,6 +10,5 @@
    		return this.digitRegEx.test(string)   		
    	} 
    }
-   var NS = rno_common.Namespace
-   NS.bindToNamespace(NS.COMMON_NS, "StringUtils", StringUtils)
+   DE_MOUSELESS_EXTENSION_NS["StringUtils"] = StringUtils
 })()

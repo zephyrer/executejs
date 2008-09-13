@@ -59,9 +59,8 @@
          }else{
          	return true
          }
-	    },
+	    }
 	}
-	var NS = rno_common.Namespace
-	NS.bindToNamespace(NS.COMMON_NS, "XMLUtils", XMLUtils);
+	DE_MOUSELESS_EXTENSION_NS["XMLUtils"] = XMLUtils;
 	
 })()
