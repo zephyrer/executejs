@@ -86,6 +86,20 @@
 		getBranch : function(branchKey) {
 			return this.prefService.getBranch(branchKey)
 		},
+		
+		/*
+		 * Returns a map of all entries of the provided branchkey
+		 */
+		getFuelPrefs: function(branchKey){
+			var result = new Array()
+			var branch = this.getBranch(branchKey)
+			var children = branch.getChildList("", {})
+			var fuelPrefs = Application.prefs
+			for (var i = 0; i < children.length; i++) {
+            result.push(fuelPrefs.get(branchKey+children[i]))
+			}
+			return result
+		},
 
 		/*
 		 * Loads all Prefs for the controls of a document The controls to
