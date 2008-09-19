@@ -222,6 +222,21 @@
            return newValue
          })
      },
+     
+      /*
+		 * Execute the provided funtion after the provided delay being in that
+		 * the function is not called another time within the provided delay
+		 */
+		executeDelayedTimerMap : new Object(),
+		executeDelayed : function(timerId, delay, functionPointer) {
+         if(this.executeDelayedTimerMap[timerId]!=null){
+         	clearTimeout(this.executeDelayedTimerMap[timerId])
+         }
+         this.executeDelayedTimerMap[timerId] = setTimeout(function(tabLocalPrefsRef){
+            functionPointer()
+            tabLocalPrefsRef.executeDelayedTimerMap[timerId] = null
+         }, delay, this)
+		},
 
       
       // Converts a pattern in this programs simple notation to a regular expression.
