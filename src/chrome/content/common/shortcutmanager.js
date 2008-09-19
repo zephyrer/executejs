@@ -149,14 +149,6 @@ function ShortCutManager_isModifierCombination(event, modifierCombination){
 ShortCutManager.isModifierCombination=ShortCutManager_isModifierCombination;
 
 /*
- * If applicable returns the label for an existing shortcut, if not it returns null
- */
-function ShortCutManager_getLabelForExistingShortcut(combinedKeyCode){
-	//TODO implement this.
-}
-ShortCutManager.getLabelForExistingShortcut=ShortCutManager_getLabelForExistingShortcut;
-
-/*
  * Construktor für Shortcut
  */
 function ShortCut(jsCode, clientId){
