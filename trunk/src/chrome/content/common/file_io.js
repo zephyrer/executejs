@@ -205,6 +205,9 @@
 	
 		fileIID    : Components.interfaces.nsIFile,
 
+		/*
+		 * retruns nsIFile
+		 */
 		get    : function(type) {
 			try {
 				var dir = Components.classes[this.dirservCID]
@@ -216,11 +219,16 @@
 				return false;
 			}
 		},
-
+		
+		//returns: nsIFile of current profile dir
+		getProfileDir: function(){
+			return this.get("ProfD")
+		},
+		
 		open   : function(path) {
 			return FileIO.open(path);
 		},
-
+		
 		create : function(dir) {
 			try {
 				dir.create(0x01, 0664);
@@ -318,4 +326,5 @@
 	}
 
 	DE_MOUSELESS_EXTENSION_NS["FileIO"] = FileIO;
+	DE_MOUSELESS_EXTENSION_NS["DirIO"] = DirIO;
 })();

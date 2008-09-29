@@ -1,139 +1,184 @@
 /*
- * SCM
- * Version 0.1
+ * ShortcutManager
  * Created by Rudolf Noé
  * 18.06.2005
- * 
- * ShortcutManager functionality
- * Under construction
- *
  */
+
 (function(){
-//Global variables
-var currentEvent = null;
 
-//Constructor
-function SCM(){
+/*
+ * Constructor
+ * @param targetObject: object on which the key event listener will be installed
+ * @param eventType: type of event on which should be listened ("keydown", "keypress"
+ */
+//TODO different event types
+function ShortcutManager(targetObject, eventType){
     this.shortCuts = new Object();
-    //TODO
-    window.addEventListener("keydown", rno.sew.SCM.onEvent, true);
+    this.currentEvent = null;
+    this.windowKeyEventHandler = new KeyEventHandler(this, "handleWindowEvent")
+    this.elementKeyEventHandler = new KeyEventHandler(this, "handleElementEvent")
+    targetObject.addEventListener("keydown", this.windowKeyEventHandler, true);
 }
 
-SCM.VERSION = "0.1"
+ShortcutManager.prototype = {
+	//Main event listening method
+	handleWindowEvent : function(event) {
+		this.onEvent(event)
+	},
+	
+   handleElementEvent: function(event){
+      var srcElement = event.target;
+      if(srcElement.id)
+         this.onEvent(event, srcElement.id)
+      else 
+         this.onEvent(event, srcElement.name);
+   },
+   
+   onEvent: function(event, elementId){
+		var shortCutKey = this.encodeEvent(event, elementId);
+		if (elementId)
+			shortCutKey = elementId + "_" + shortCutKey;
+		var shortCutArray = this.shortCuts[shortCutKey]
+		if (shortCutArray) {
+			this.currentEvent = event;
+			for (var i = 0; i < shortCutArray.length; i++) {
+				var result = shortCutArray[i].onEvent(event);
+				if (result & this.PREVENT_FURTHER_EVENTS) {
+					break;
+				}
+			}
+		} else {
+			this.currentEvent = null;
+		}
+   },
+   
+   addJsShortCut: function(keyCode, modifierMask, jsCode, clientId){
+       if(modifierMask==null){
+           modifierMask = 0;
+       }
+       var combinedKeyCode = this.createShortCutKey(keyCode, modifierMask)       
+       this.addJsShortCutWithCombinedKeyCode(combinedKeyCode, jsCode, clientId)
+   },
+   
+   /*
+    * Adds JS shortcut
+    * @param combinedKeyCode: combinedKeyCode = keyCode << 4 | Event.ALT_MASK | Event.CONTROL_MASK | Event.SHIFT_MASK | Event.META_MASK 
+    *    @see createCominedKeyCode
+    * @param jsCode: String containing JS
+    * @param cliendId: id with which the shortcut can be removed 
+    */
+   addJsShortCutWithCombinedKeyCode: function(combinedKeyCode, jsCode, clientId){
+       var shortcutArray = this.shortCuts[combinedKeyCode];
+       var newShortCut = new ShortCut(jsCode, clientId);
+       if(shortcutArray==null)
+           this.shortCuts[combinedKeyCode] = new Array(newShortCut);
+       else
+           shortcutArray.push(newShortCut);
+   },
+   
+   /*
+    * param: combinedKeyCode = keyCode << 4 | Event.ALT_MASK | Event.CONTROL_MASK | Event.SHIFT_MASK
+    */
+   addJsShortCutForElement: function(elementId, keyCode, modifierMask, jsCode, clientId){
+      var element = document.getElementById(elementId);
+      if(!element)
+         throw new Error("Element for elementId does not exist");
+      var shortCutKey = this.createShortCutKey(keyCode, modifierMask, elementId)
+      this.addJsShortCutWithCombinedKeyCode(shortCutKey, jsCode, clientId)
+      element.addEventListener("keydown", this.elementKeyEventHandler, true);
+   },
+   
+   /*
+    * Löscht alle Shortcuts mit einer bestimmten
+    * ClientId
+    */
+   clearAllShortCutsForClientId: function(clientId){
+      try{
+         var shortCuts = this.shortCuts;
+         for(i in shortCuts){
+            var shortCutArray = shortCuts[i];
+            var newShortCutArray = new Array();
+            for(var j = 0; j < shortCutArray.length; j++){
+               var shortCut = shortCutArray[j];
+               if(shortCut.clientId!=clientId)
+                  newShortCutArray[newShortCutArray.length] = shortCut;
+            }
+            shortCuts[i] = newShortCutArray;
+         }
+      }catch(e){alert(e)}
+   },
 
-function getInstance(){
-    if(!SCM.instance){
-        SCM.instance = new SCM();
-    }
-    return SCM.instance;
-}
-SCM.getInstance=getInstance;
+   createCombinedKeyCode: function(keyCode, modifierMask){
+   	return keyCode << 4 | modifierMask
+   },
 
-function addShortCut(keyCode, modifierMask, action){
-    if(modifierMask==null){
-        modifierMask = 0;
-    }
-    var shortCutKey = createCombinedShortCutKey(keyCode, modifierMask)
-    getInstance().shortCuts[shortCutKey] = action;
+   createShortCutKey: function(keyCode, modifierMask, elementId){
+      var shortCutKey = keyCode << 4 | modifierMask;
+      if(elementId)
+         shortCutKey = elementId + "_" + shortCutKey;
+      return shortCutKey;
+   },
+   
+   /*
+    * Encodes KeyEvent
+    */
+   encodeEvent: function(event){
+       return event.keyCode << 4 | this.encodeEventModifier(event);
+   },
+   
+   encodeEventModifier: function(event){
+       return event.altKey * Event.ALT_MASK |
+           event.ctrlKey * Event.CONTROL_MASK |
+           event.shiftKey * Event.SHIFT_MASK |
+           event.metaKey * Event.META_MASK;
+   },
+   
+   isModifierCombination: function(event, modifierCombination){
+       return this.encodeEventModifier(event)==modifierCombination
+   }
 }
-SCM.prototype.addShortCut = addShortCut;
 
 /*
- * param: combinedKeyCode = keyCode << 4 | Event.ALT_MASK | Event.CONTROL_MASK | Event.SHIFT_MASK
+ * Constructor for KeyEventHandler
  */
-function addShortCutWithCombinedKeyCode(combinedShortCutKey, action){
-    var shortcutArray = getInstance().shortCuts[combinedShortCutKey];
-    if(shortcutArray==null)
-        getInstance().shortCuts[combinedShortCutKey] = new Array(action);
-    else
-        shortcutArray[shortcutArray.length] = action;
+function KeyEventHandler(shortcutManager, scmHandleEventFunction){
+   this.shortcutManager = shortcutManager
+   this.scmHandleEventFunction = scmHandleEventFunction
 }
-SCM.prototype.addShortCutWithCombinedKeyCode = addShortCutWithCombinedKeyCode
-
-function onEvent(event){
-    var shortCuts = getInstance().shortCuts;
-    var shortCutKey = createCombinedShortCutKey(event.keyCode, encodeEventModifier(event));
-    //Components.utils.reportError("SEW: ShortCutKey " + shortCutKey);
-    var shortCutArray = shortCuts[shortCutKey];
-    if(shortCutArray){
-        SCM.currentEvent = event;
-        for(var i=0; i<shortCutArray.length; i++){
-            shortCutArray[i].onEvent(event);
-        }
-    }else{
-        SCM.currentEvent = null;
-    }
+KeyEventHandler.prototpye = {
+   handleEvent: function(event){
+      this.shortcutManager[this.scmHandleEventFunction]()
+   }
 }
-SCM.onEvent = onEvent;
 
 /*
- * Löscht alle Shortcuts mit einer bestimmten
- * ClientId
+ * Construktor für Shortcut
  */
-function clearShortcuts(){
-	this.shortCuts = new Object();
-}
-SCM.prototype.clearShortcuts = clearShortcuts;
-
-function createCombinedShortCutKey(keyCode, modifierMask){
-	var shortCutKey = keyCode << 4 | modifierMask;
-	return shortCutKey;
+function ShortCut(jsCode, clientId){
+    this.jsCode = jsCode.replace(/'/g, '"');
+    this.clientId = clientId;
 }
 
-function encodeEventModifier(event){
-    return event.altKey * Event.ALT_MASK |
-        event.ctrlKey * Event.CONTROL_MASK |
-        event.shiftKey * Event.SHIFT_MASK |
-        event.metaKey * Event.META_MASK;
+Shortcut.prototype = {
+   onEvent: function(event){
+       var result = window.eval(this.jsCode);
+       if(result&this.SUPPRESS_KEY){
+          event.preventDefault();
+          event.stopPropagation();
+       }
+       return result
+   }
 }
 
 //Constants
-SCM.ALT = SCM.prototype.Alt = Event.ALT_MASK;
-SCM.CTRL = SCM.prototype.CTRL = Event.CONTROL_MASK;
-SCM.SHIFT = SCM.prototype.SHIFT = Event.SHIFT_MASK;
-SCM.CTRL_SHIFT = SCM.prototype.CTRL_SHIFT = Event.CONTROL_MASK | Event.SHIFT_MASK;
-SCM.ALT_SHIFT = SCM.prototype.ALT_SHIFT = Event.ALT_MASK | Event.SHIFT_MASK;
-SCM.SUPPRESS_EVENT = SCM.prototype.SUPPRESS_EVENT = "suppressEvent";
+ShortcutManager.ALT = Event.ALT_MASK;
+ShortcutManager.CTRL = Event.CONTROL_MASK;
+ShortcutManager.SHIFT = Event.SHIFT_MASK;
+ShortcutManager.CTRL_SHIFT = Event.CONTROL_MASK | Event.SHIFT_MASK;
+ShortcutManager.ALT_SHIFT = Event.ALT_MASK | Event.SHIFT_MASK;
+ShortcutManager.CTRL_ALT = Event.ALT_MASK | Event.CONTROL_MASK;
+ShortcutManager.SUPPRESS_KEY = 1;
+ShortcutManager.PREVENT_FURTHER_EVENTS = 2
 
-window.rno.Utils.bindToNamespace("rno.sew", "SCM", SCM);
-})();
-
-(function() {
-function GenericAction(htmlElement){
-    this.element = htmlElement; 
-}
-
-GenericAction.VERSION = "0.1",
-
-GenericAction.prototype.onEvent = function(event){
-
-    var tagName = this.element.tagName.toLowerCase();
-    var type = this.element.type?this.element.type.toLowerCase():null;
-    
-    //If it is text- or password-field
-    if((tagName=="input" && (type=="text" || type=="password")) ||
-        tagName=="textarea"){
-            this.element.select();
-            return;
-    } 
-    //In every other case try to focus
-    else {
-        try{
-            this.element.focus();
-        }catch(e){}
-    }
-    	
-    //And simulate click
-	var clickEvent = content.document.createEvent("MouseEvents");
-    clickEvent.initMouseEvent( "click", true, true, content, 0, 0, 0, 0, 0, 
-        false, false, false, false, 0, null);
-    this.element.dispatchEvent(clickEvent);
-    rno.Utils.logMessage("SEW: Action for element " + this.element.name + " done");
-}
-
-window.rno.Utils.bindToNamespace("rno.sew", "GenericAction", GenericAction);
-})();
-
-function RNO_addShortcut(){
-	window.open("chrome://shortcutseverywhere/content/adddialog/adddialog.xul","sew_adddialog", "chrome,width=300,height=300,resizable");    
-}
+DE_MOUSELESS_EXTENSION_NS["ShortcutManager"] = ShortcutManager;
+})()
