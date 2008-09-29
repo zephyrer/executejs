@@ -10,11 +10,13 @@
    }
    
    ArrayList.prototype = {
-      append: function(obj){
+      constructor: ArrayList,
+      
+      add: function(obj){
          this.array.push(obj)
       },
       
-      addItem: function(index, obj){
+      addAtIndex: function(index, obj){
       	this.array = this.array.slice(0,index).concat(obj).concat(this.array.slice(index))
       },
       
@@ -25,12 +27,19 @@
       contains: function(obj){
       	return this.array.indexOf(obj)!=-1
       },
+      
+      get: function(index){
+      	if(index>this.array.length-1){
+      		throw new Error("ArrayList.get: IndexOutOfBounds")
+      	}
+      	return this.array[index]
+      },
 
-      remove: function(index){
+      removeAtIndex: function(index){
       	this.array = this.array.slice(0,index).concat(this.array.slice(index+1))
       },
       
-      removeItem: function(obj){
+      remove: function(obj){
       	this.remove(this.array.indexOf(obj))
       },
       
