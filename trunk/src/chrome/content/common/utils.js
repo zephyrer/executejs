@@ -2,12 +2,57 @@
  * Utiltily functions
  */
 (function(){
+	//These two functions must be defined "globally" as they are used in the bind function
+	// Taken from firebug, see firebug-license.txt
+	function arrayInsert(array, index, other) {
+		for (var i = 0; i < other.length; ++i)
+			array.splice(i + index, 0, other[i]);
+		return array;
+	}
+
+	//Taken from firebug, see firebug-license.txt
+	function cloneArray (array, fn) {
+		var newArray = [];
+
+		if (fn)
+			for (var i = 0; i < array.length; ++i)
+				newArray.push(fn(array[i]));
+		else
+			for (var i = 0; i < array.length; ++i)
+				newArray.push(array[i]);
+
+		return newArray;
+	}
+	
 	var Utils = {
 		VERSION: "0.2",
 	
+		//Taken from firebug, see firebug-license.txt
+		bind : function() {
+			var args = cloneArray(arguments), fn = args.shift(), object = args.shift();
+			return function() {
+				return fn.apply(object, arrayInsert(cloneArray(args), 0, arguments));
+			}
+		},
+
+      extend : function(constructorSubClass, constructorSuperclass) {
+      	function copyMembers(source, target){
+   			for (var member in source) {
+   				if(!target.prototype[member]){
+   				  target.prototype[member] = source[member]
+   				}
+   			}
+      		
+      	}
+      	var source = constructorSuperclass.prototype
+      	do{
+			   copyMembers(source, constructorSubClass)
+			   source = source.prototype
+      	}while(source!=null)
+		},
+		
 		/*
-		 * Logs message to Console services
-		 * @param messageString: string to log 
+		 * Logs message to Console services @param messageString: string to log
 		 */
 		logMessage: function (messageString) {
 		    var consoleService = Components.classes["@mozilla.org/consoleservice;1"]
@@ -289,7 +334,12 @@
 		    res = tldRes[1] + tldStr + tldRes[3];
 		  }
 		  return new RegExp(res + "$", "i");
-		}
+		},
+		
+		stopEvent: function(event){
+			event.stopPropagation()
+			event.preventDefault()
+		},
 	}
 	
 	DE_MOUSELESS_EXTENSION_NS["Utils"] = Utils;

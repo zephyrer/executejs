@@ -5,17 +5,23 @@
 
 (function(){
 	
-      // main entry for serialization  
-      // JavaScript object as an input
-      // usage: JSerialize(MyObject);
-      // other parameters objectName, indentSpace may be omitted
-      function JSerialize(ObjectToSerilize, objectName, indentSpace, ommitFunctions)
+      /* main entry for serialization
+       * JavaScript object as an input
+       * usage: JSerialize(MyObject);
+       * @ObjectToSerilize: Object which should be serialized
+       * @objectName: Name of the root object
+       * @indentSpace: String with spaces which is used to indent output
+       * @ommitFunction: Boolean indicating whether functions should be serialized or not
+       * @prefixOfTransientMembers: If attribute of object has this prefix it will not be serialized 
+       */
+      function JSerialize(ObjectToSerilize, objectName, indentSpace, ommitFunctions, prefixOfTransientMembers)
       {
          indentSpace = indentSpace?indentSpace:'';
          
          var Type = GetTypeName(ObjectToSerilize);
          
-         if((Type=="Function" && ommitFunctions) || objectName=="prototype"){
+         if((Type=="Function" && ommitFunctions) || objectName=="prototype" || 
+            (prefixOfTransientMembers!=null && objectName.indexOf(prefixOfTransientMembers)==0)){
          	return ""
          }
           
@@ -44,7 +50,7 @@
       				
       				for(var name in ObjectToSerilize)
       				{
-      					s += JSerialize(ObjectToSerilize[name], ('index' + name ), indentSpace + "   ", ommitFunctions);
+      					s += JSerialize(ObjectToSerilize[name], ('index' + name ), indentSpace + "   ", ommitFunctions, prefixOfTransientMembers);
       				};
       				
       				s += indentSpace;
@@ -57,7 +63,7 @@
       			
       			for(var name in ObjectToSerilize)
       			{
-      				s += JSerialize(ObjectToSerilize[name], name, indentSpace + "   ", ommitFunctions);
+      				s += JSerialize(ObjectToSerilize[name], name, indentSpace + "   ", ommitFunctions, prefixOfTransientMembers);
       			};
       			
       			s += indentSpace;
@@ -73,10 +79,10 @@
       
       // main entry for deserialization
       // XML string as an input
-      function JDeserialize(XmlText)
+      function JDeserialize(XmlText, namespaceArray)
       {
       	var _doc = GetDom(XmlText); 
-      	return Deserial(_doc.childNodes[0]);
+      	return Deserial(_doc.childNodes[0], namespaceArray);
       }
       
       // get dom object . IE or Mozilla
@@ -87,7 +93,7 @@
       }
       
       // internal deserialization
-      function Deserial(xn)
+      function Deserial(xn, namespaceArray)
       {
       	var RetObj; 
       	 
@@ -119,24 +125,28 @@
       				if(node.nodeType!=1){
       					continue
       				}
-      				RetObj[arrayIndex++] = Deserial(node);
+      				RetObj[arrayIndex++] = Deserial(node, namespaceArray);
       			}
       			
       			return RetObj;
       		}
       		
       		case "object":
+      		    RetObj = new Object()
+      		    break;
+      		
       		default:
       		{
-      			try
-      			{
-      				RetObj = eval("new "+ NodeType + "()");
+   				var ns = ""
+      			if(namespaceArray){
+      				for (var i = 0; i < namespaceArray.length; i++) {
+      					if(window[namespaceArray[i]][NodeType]!=null){
+      						ns = namespaceArray[i]
+      						break;
+      					}
+      				}
       			}
-      			catch(e)
-      			{
-      				// create generic class
-      				RetObj = new Object();
-      			}
+      			RetObj = eval("new "+ (ns.length>0?ns+".":"") + NodeType + "()");
       		}
       		break;
       	}
@@ -147,7 +157,7 @@
       		if(node.nodeType!=1){
       			continue
       		}
-      		RetObj[node.nodeName] = Deserial(node);
+      		RetObj[node.nodeName] = Deserial(node, namespaceArray);
       	}
       
       	return RetObj;
@@ -261,6 +271,13 @@
       	return Type;
       }
 
-   DE_MOUSELESS_EXTENSION_NS["JSerialize"] = JSerialize;
-   DE_MOUSELESS_EXTENSION_NS["JDeserialize"] = JDeserialize;
+   JSerial = {
+   	classes: {},
+   	serialize: JSerialize,
+   	deserialize: JDeserialize,
+   	registerClass: function(key, constructor){
+   		this.classes[key] = constructor
+   	}
+   }
+   DE_MOUSELESS_EXTENSION_NS["JSerial"] = JSerial;
 })()
