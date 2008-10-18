@@ -7,7 +7,7 @@
    		this.level = level
    	},
       getCellText : function(column) {
-         return ""
+         throw new Error ('Not implemented')
       },
       isContainer : function() {
          return false

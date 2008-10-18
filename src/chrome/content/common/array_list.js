@@ -1,9 +1,14 @@
 (function(){   
    function ArrayList (arg){
-   	if(arg!=null && arg.prototype.constructor==Array){
-   		this.array = array
-   	}else if(arg!=null && !isNaN(arg)){
-   		this.array = new Array(arg)
+   	if(arg!=null){
+   		if(arg.constructor ==Array){
+      		this.array = new Array()
+   			for (var i = 0; i < arg.length; i++) {
+   				this.add(arg[i])
+   			}
+   	   }else{
+   	   	this.array = new Array(arg)
+   	   }
    	}else{
    		this.array = new Array()
    	}
@@ -14,6 +19,15 @@
       
       add: function(obj){
          this.array.push(obj)
+      },
+      
+      addAll: function(arr){
+         if(arr.constructor == ArrayList){
+         	arr = arr.array
+         }
+         for (var i = 0; i < arr.length; i++) {
+         	this.add(arr[i])
+         }
       },
       
       addAtIndex: function(index, obj){
@@ -55,8 +69,18 @@
       
       size: function(){
       	return this.array.length
-      }
+      },
       
+      toArray: function(){
+      	var newArray = new Array()
+      	for (var i = 0; i < this.array.length; i++)
+      		newArray.push(this.get(i))
+      	return newArray
+      },
+      
+      toString: function(){
+      	return "ArrayList: " + this.array.toString()
+      }
       
       
    }
