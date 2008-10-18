@@ -30,7 +30,6 @@
          switch(Type)
          {
       		case "number":
-      		case "string":
       		case "boolean":		
       		{
       			s += ObjectToSerilize; 
@@ -38,13 +37,21 @@
          
       		break;
       	   
-      	   case "date":
+      		case "string":
+      		{
+      			s += "<![CDATA[" + ObjectToSerilize +"]]>"
+;
+      		}
+      		
+      		break;
+
+      		case "date":
       	   {
       			s += ObjectToSerilize.toLocaleString(); 
       	   }
       	   break;
       	   
-      		case "array":
+      		case "Array":
       		{
       			s += "\n";
       				
@@ -115,9 +122,9 @@
       	
       	switch(NodeType)
       	{
-      		case "array":
+      		case "Array":
       		{
-      			RetObj = [];
+      			RetObj = new Array();
       			var arrayIndex = 0
       			for(var i = 0; i < xn.childNodes.length; i++)
       			{
@@ -253,9 +260,6 @@
        
       function GetTypeName(ObjectToSerilize)
       {
-      	if (ObjectToSerilize instanceof Array)
-      		return "array";
-      		
       	if (ObjectToSerilize instanceof Date)
       		return "date";	
       		

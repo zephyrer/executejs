@@ -109,8 +109,12 @@
 			//Items with pref function
 			var prefFuncItems = document.getElementsByAttribute(PREF_FUNCT_LOAD_ATTR, "*")
 			for (var i = 0; i < prefFuncItems.length; i++) {
-				var functionName = prefFuncItems.item(i).getAttribute(PREF_FUNCT_LOAD_ATTR)
-				window[functionName]()
+				var prefFunction = prefFuncItems.item(i).getAttribute(PREF_FUNCT_LOAD_ATTR)
+				if(window[prefFunction] instanceof Function){
+					window[prefFunction]()
+				}else{
+					window.eval(prefFunction)
+				}
 			}
 			
 			// Checkboxes
@@ -185,8 +189,12 @@
             //Items with pref function
             var prefFuncItems = document.getElementsByAttribute(PREF_FUNCT_SAVE_ATTR, "*")
             for (var i = 0; i < prefFuncItems.length; i++) {
-               var functionName = prefFuncItems.item(i).getAttribute(PREF_FUNCT_SAVE_ATTR)
-               window[functionName]()
+               var prefFunction = prefFuncItems.item(i).getAttribute(PREF_FUNCT_SAVE_ATTR)
+               if(window[prefFunction] instanceof Function){
+                  window[prefFunction]()
+               }else{
+               	window.eval(prefFunction)
+               }
             }
 
 				// Checkboxes

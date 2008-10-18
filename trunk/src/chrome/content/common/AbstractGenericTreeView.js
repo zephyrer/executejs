@@ -1,14 +1,16 @@
 (function(){
-	ArrayList = DE_MOUSELESS_EXTENSION_NS.ArrayList
 	
 	function AbstractGenericTreeView() {
 	}
 	
 	AbstractGenericTreeView.prototype = {
-		AbstractGenericTreeView: function(){
+		AbstractGenericTreeView: function(tree){
+			this.tree = tree
    		this.treebox = null
    		this.visibleItems = new ArrayList()
 			this.rowCount = 0
+			//registration of the view 
+			this.tree.view = this
 		},
 		addVisibleItem: function(item){
 			this.visibleItems.add(item)
@@ -30,8 +32,11 @@
 		},
 		getRowProperties : function(row, props) {
 		},
+		getTreeBox: function(){
+			return this.treebox
+		},
 		getVisibleItems: function(){
-			this.visibleItems
+			return this.visibleItems
 		},
 		isContainer : function(row) {
          return this.visibleItems.get(row).isContainer()
@@ -48,9 +53,25 @@
 		isSorted : function() {
 			return false;
 		},
+		removeItem: function(index){
+			this.visibleItems.removeAtIndex(index)
+			this.updateRowCount()
+			this.rowCountChanged(index, -1)
+		},
+      removeSelected: function(){
+         if(this.tree.currentIndex==-1)
+            return
+         this.removeItem(this.tree.currentIndex)
+      },
+		rowCountChanged: function(index, count){
+      	if(this.treebox==null)
+      	  return
+      	this.treebox.rowCountChanged(index, count)
+      },
 		setTree : function(treebox) {
 			this.treebox = treebox;
 		},
+		//@param visibleItems: ArrayList contains objects of Type AbstractGenericTreeItem
 		setVisibleItems: function(visibleItems){
 			this.visibleItems = visibleItems
 			this.updateRowCount()
@@ -62,12 +83,6 @@
       toggleOpenState: function(row){
       	throw new Error('Not implemented')
       },
-      rowCountChanged: function(index, count){
-      	if(this.treebox==null)
-      	  return
-      	this.treebox.rowCountChanged(index, count)
-      }
-	}
-	
+	}	
 	DE_MOUSELESS_EXTENSION_NS["AbstractGenericTreeView"] = AbstractGenericTreeView;
 })()

@@ -26,6 +26,10 @@
          this.addStyleSheet(doc, link)
       },
       
+      containsFrames: function(win){
+      	return win.frames.length>0
+      },
+      
       //Taken from firebug, see firebug-license.txt
       createStyleSheet : function(doc, url) {
          var link = doc.createElementNS("http://www.w3.org/1999/xhtml", "link");
@@ -44,6 +48,33 @@
          return doc.getElementsByTagName("body")[0];
       },
       
+      getFrameByName: function(win, name){
+      	var result = null
+      	this.iterateWindows(win, function(subWin){
+      	  if(subWin.name == name)
+      	     result = subWin
+      	})
+      	return result
+      },
+      
+      getFrameByLocationHref: function(win, href){
+         var result = null
+         this.iterateWindows(win, function(subWin){
+           if(subWin.location.href == href)
+              result = subWin
+         })
+         return result
+      },
+
+      getFrameByHrefRegExp: function(win, hrefRegExp){
+         var result = new Array()
+         this.iterateWindows(win, function(subWin){
+           if(hrefRegExp.test(subWin.location.href))
+              result.push(subWin)
+         })
+         return result
+      },
+
       /*
        * @param element: element for which offset should be computed @param
        * leftOrTop: values offsetLeft/offsetTop
@@ -58,6 +89,17 @@
             offset.x += element.offsetLeft
          }
          return offset
+      },
+      
+      getOwnerWindow: function(element){
+      	return element.ownerDocument.defaultView
+      },
+      
+      iterateDescendantsByTagName: function(element, descendantTagName, funcPointer){
+      	var descendants = element.getElementsByTagName(descendantTagName)
+      	for (var i = 0; i < descendants.length; i++) {
+      		funcPointer(descendants[i])
+      	}
       },
       
       // Taken from firebug, see firebug-license.txt
@@ -85,6 +127,8 @@
       //Taken from firebug, see firebug-license.txt
       ownerDocIsFrameset: function(elt){
          var body = this.getBody(elt.ownerDocument);
+         if(body==null)
+            return false
          return body.localName.toUpperCase() == "FRAMESET"
       },
       

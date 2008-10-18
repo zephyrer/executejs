@@ -9,11 +9,11 @@
 					break
 				}
 				if(element.hasAttribute('name')){
-					result = "[@name='" + element.name + "')" + result
+					result = "[@name='" + element.getAttribute('name') + "']" + result
 					doBreak = true
 				}
 				if(element.hasAttribute('href')){
-					result = "[@href='" + element.href + "')" + result
+					result = "[@href='" + element.getAttribute('href') + "']" + result
 					doBreak = true
 				}
 				if(!doBreak){
@@ -23,8 +23,10 @@
 					}
 				}
 				result = "/" + element.tagName + result
-				if(doBreak)
+				if(doBreak){
+              result = "/" + result					
 				  break;
+				}
 				element = element.parentNode
 			}while(element.nodeName!='#document')
 			

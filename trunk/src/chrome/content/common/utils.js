@@ -35,22 +35,6 @@
 			}
 		},
 
-      extend : function(constructorSubClass, constructorSuperclass) {
-      	function copyMembers(source, target){
-   			for (var member in source) {
-   				if(!target.prototype[member]){
-   				  target.prototype[member] = source[member]
-   				}
-   			}
-      		
-      	}
-      	var source = constructorSuperclass.prototype
-      	do{
-			   copyMembers(source, constructorSubClass)
-			   source = source.prototype
-      	}while(source!=null)
-		},
-		
 		/*
 		 * Logs message to Console services @param messageString: string to log
 		 */
@@ -174,7 +158,6 @@
 		
 		createObserverForInterface: function(nsIObserver){
          var observer = {
-         	nsIObserver: nsIObserver,
 	    	   QueryInterface: function(iid) {
 					if (!iid.equals(Components.interfaces.nsISupports)
 							&& !iid.equals(Components.interfaces.nsISupportsWeakReference)
@@ -182,12 +165,11 @@
 						throw Components.results.NS_ERROR_NO_INTERFACE; }
 					return this;
 	    	   },
-	    	   
 	    	   observe: function(){
-	    	   	nsIObserver.observe();
+	    	      nsIObserver.observe();
 	    	   }
-	     }
-	     return observer;
+         }
+	      return observer;
 		},
 		
 		/*
@@ -261,9 +243,14 @@
       	}
       },
       
-      observeObject: function(objectToObserve, propertyToObserve, callbackFunction){
+      observeObject: function(objectToObserve, propertyToObserve, callbackFunction, thisObj){
          objectToObserve.watch(propertyToObserve, function(prop, oldValue, newValue){
-           setTimeout(callbackFunction)
+           setTimeout(function(){
+              if(thisObj)
+                 callbackFunction.apply(thisObj)
+              else
+                 callbackFunction()
+           })
            return newValue
          })
      },
@@ -273,12 +260,15 @@
 		 * the function is not called another time within the provided delay
 		 */
 		executeDelayedTimerMap : new Object(),
-		executeDelayed : function(timerId, delay, functionPointer) {
+		executeDelayed : function(timerId, delay, functionPointer, thisObj) {
          if(this.executeDelayedTimerMap[timerId]!=null){
          	clearTimeout(this.executeDelayedTimerMap[timerId])
          }
          this.executeDelayedTimerMap[timerId] = setTimeout(function(tabLocalPrefsRef){
-            functionPointer()
+         	if(thisObj!=null)
+         	  functionPointer.apply(thisObj)
+         	else
+               functionPointer()
             tabLocalPrefsRef.executeDelayedTimerMap[timerId] = null
          }, delay, this)
 		},
@@ -286,6 +276,7 @@
       
       // Converts a pattern in this programs simple notation to a regular expression.
 		// thanks AdBlock! http://www.mozdev.org/source/browse/adblock/adblock/
+		//
 		convert2RegExp: function ( pattern ) {
 		  var s = new String(pattern);
 		  var res = new String("^");

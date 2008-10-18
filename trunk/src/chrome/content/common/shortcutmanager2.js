@@ -68,7 +68,7 @@ ShortcutManager.prototype = {
     */
    addShortcut: function(combinedKeyCode, shortcutTarget, clientId){
    	var shortcut = null
-   	if(shortcutTarget instanceof String){
+   	if(shortcutTarget.constructor == String){//instanceof doesn't work
    		shortcut = new JsShortcut(shortcutTarget, clientId)
    	}else if(shortcutTarget.onEvent instanceof Function){
    		shortcut = shortcutTarget
