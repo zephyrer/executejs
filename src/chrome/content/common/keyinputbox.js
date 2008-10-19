@@ -1,3 +1,4 @@
+with(this){
 /*
  * 
  */
@@ -51,6 +52,7 @@
 			return arr.join('+');
 		}
 	}
-   DE_MOUSELESS_EXTENSION_NS["KeyInputbox"] = KeyInputbox
-})()
+   this["KeyInputbox"] = KeyInputbox
+}).apply(this)
    
+}

@@ -1,3 +1,4 @@
+with(this){
 (function(){
 	function PerfTimer(){
 		this.start = new Date()
@@ -11,5 +12,6 @@
 			return this.stop.getTime()-this.start.getTime()
 		}
 	} 
-   DE_MOUSELESS_EXTENSION_NS["PerfTimer"] =  PerfTimer;
-})()
+   this["PerfTimer"] =  PerfTimer;
+}).apply(this)
+}

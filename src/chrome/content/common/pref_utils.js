@@ -1,5 +1,5 @@
+with(this){
 (function() {
-   Utils = DE_MOUSELESS_EXTENSION_NS.Utils
 	var PrefUtils = {
 		HELP_ID_ATTR : "helpid",
 
@@ -58,5 +58,6 @@
 		}
 	}
 
-	DE_MOUSELESS_EXTENSION_NS["PrefUtils"] = PrefUtils;
-})()
+	this["PrefUtils"] = PrefUtils;
+}).apply(this)
+}

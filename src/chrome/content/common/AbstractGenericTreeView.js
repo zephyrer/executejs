@@ -1,3 +1,4 @@
+with(this){
 (function(){
 	
 	function AbstractGenericTreeView() {
@@ -84,5 +85,6 @@
       	throw new Error('Not implemented')
       },
 	}	
-	DE_MOUSELESS_EXTENSION_NS["AbstractGenericTreeView"] = AbstractGenericTreeView;
-})()
+	this["AbstractGenericTreeView"] = AbstractGenericTreeView;
+}).apply(this)
+}

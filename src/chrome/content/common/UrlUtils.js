@@ -1,3 +1,4 @@
+with(this){
 (function(){
 	var UrlUtils = {
       // Converts a pattern in this programs simple notation to a regular expression.
@@ -91,5 +92,6 @@
 		
 	}
 
-	DE_MOUSELESS_EXTENSION_NS["UrlUtils"] = UrlUtils;
-})()
+	this["UrlUtils"] = UrlUtils;
+}).apply(this)
+}

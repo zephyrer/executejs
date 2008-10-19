@@ -1,3 +1,4 @@
+with(this){
 (function(){
 	function AbstractGenericEventHandler(){
 	}
@@ -12,5 +13,6 @@
 			}
 		}
 	}
-   DE_MOUSELESS_EXTENSION_NS["AbstractGenericEventHandler"] = AbstractGenericEventHandler;
-})()
+   this["AbstractGenericEventHandler"] = AbstractGenericEventHandler;
+}).apply(this)
+}

@@ -1,9 +1,10 @@
+with(this){
 (function(){
 	PromptReply = {
 		YES: 0,
 		NO: 1
 	}
-	DE_MOUSELESS_EXTENSION_NS["PromptReply"] = PromptReply;
+	this["PromptReply"] = PromptReply;
 	
 	var PromptService = {
 		promptService: Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
@@ -16,5 +17,6 @@
       }
 	}
 
-	DE_MOUSELESS_EXTENSION_NS["PromptService"] = PromptService;
-})()
+	this["PromptService"] = PromptService;
+}).apply(this)
+}

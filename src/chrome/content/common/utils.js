@@ -1,3 +1,4 @@
+with(this){
 /*
  * Utiltily functions
  */
@@ -333,7 +334,9 @@
 		},
 	}
 	
-	DE_MOUSELESS_EXTENSION_NS["Utils"] = Utils;
+	this["Utils"] = Utils;
 	
-})()
+}).apply(this)
 
+
+}

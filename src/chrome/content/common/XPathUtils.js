@@ -1,3 +1,4 @@
+with(this){
 (function(){
 	var XPathUtils = {
 		createXPath: function(element){
@@ -68,5 +69,6 @@
       }
    }
    
-	DE_MOUSELESS_EXTENSION_NS["XPathUtils"] = XPathUtils;
-})()
+	this["XPathUtils"] = XPathUtils;
+}).apply(this)
+}

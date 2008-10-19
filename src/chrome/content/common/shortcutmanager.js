@@ -1,3 +1,4 @@
+with(this){
 /*
  * ShortCutManager
  * Version 0.1
@@ -175,3 +176,5 @@ ShortCutManager.ALT_SHIFT = Event.ALT_MASK | Event.SHIFT_MASK;
 ShortCutManager.CTRL_ALT = Event.ALT_MASK | Event.CONTROL_MASK;
 ShortCutManager.SUPPRESS_KEY = 1;
 ShortCutManager.PREVENT_FURTHER_EVENTS = 2
+
+}

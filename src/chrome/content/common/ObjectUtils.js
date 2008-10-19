@@ -1,3 +1,4 @@
+with(this){
 (function(){
 	var BasicObjectTypes = {
 		ARRAY: "Array",
@@ -148,5 +149,6 @@
    	}
 	}
 	
-	DE_MOUSELESS_EXTENSION_NS["ObjectUtils"] = ObjectUtils;
-})()
+	this["ObjectUtils"] = ObjectUtils;
+}).apply(this)
+}

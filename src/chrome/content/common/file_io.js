@@ -1,3 +1,4 @@
+with(this){
 (function(){
 	/////////////////////////////////////////////////
 	// Basic file IO object based on Mozilla source 
@@ -325,6 +326,7 @@
 		DirIO.sep = '\\';
 	}
 
-	DE_MOUSELESS_EXTENSION_NS["FileIO"] = FileIO;
-	DE_MOUSELESS_EXTENSION_NS["DirIO"] = DirIO;
-})();
+	this["FileIO"] = FileIO;
+	this["DirIO"] = DirIO;
+}).apply(this);
+}

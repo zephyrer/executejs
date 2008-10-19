@@ -1,3 +1,4 @@
+with(this){
 (function() {
    var DomUtils = {
       
@@ -137,5 +138,6 @@
          elt.style.height = h + "px"
       }
    }
-DE_MOUSELESS_EXTENSION_NS["DomUtils"] = DomUtils;
-})()
+this["DomUtils"] = DomUtils;
+}).apply(this)
+}

@@ -1,3 +1,4 @@
+with(this){
 /**
  * Contain string utility methodes
  */
@@ -18,5 +19,6 @@
    		return string!=null?string:""
    	}
    }
-   DE_MOUSELESS_EXTENSION_NS["StringUtils"] = StringUtils
-})()
+   this["StringUtils"] = StringUtils
+}).apply(this)
+}
