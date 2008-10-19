@@ -1,3 +1,4 @@
+with(this){
 /*
  * ShortcutManager
  * Created by Rudolf Noé
@@ -233,5 +234,6 @@ ShortcutManager.CTRL_ALT = Event.ALT_MASK | Event.CONTROL_MASK;
 ShortcutManager.SUPPRESS_KEY = 1;
 ShortcutManager.PREVENT_FURTHER_EVENTS = 2
 
-DE_MOUSELESS_EXTENSION_NS["ShortcutManager"] = ShortcutManager;
-})()
+this["ShortcutManager"] = ShortcutManager;
+}).apply(this)
+}

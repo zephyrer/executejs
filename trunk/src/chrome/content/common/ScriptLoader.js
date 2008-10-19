@@ -1,3 +1,4 @@
+with(this){
 (function(){
    const JS_SCRIPT_LOADER = Components.classes["@mozilla.org/moz/jssubscript-loader;1"].
                      getService(Components.interfaces.mozIJSSubScriptLoader)
@@ -6,56 +7,77 @@
 	const IO_SERVICE = Components.classes["@mozilla.org/network/io-service;1"].
                      getService(Components.interfaces.nsIIOService)
 
-   function ScriptLoader(chromeBase){
-		this.chromeBase = this.assureEndingSlash(chromeBase)
-   	this.fileIO = null
-	}
+	var ScriptLoader = {
 		
-	ScriptLoader.prototype ={
-		assureEndingSlash: function(path){
-			if(path==null || path=="")
-			   return ""
-			return path.lastIndexOf("/")==path.length-1?path:path+"/"
-		},
-		
-		loadAllCommon: function(relativePath, scopeObj){
-			this.setGlobalNamespaceObj(scopeObj)
-			if(this.fileIO==null){
-			   this.loadScript(this.chromeBase + this.assureEndingSlash(relativePath) + "file_io.js", scopeObj)
-			   this.fileIO = scopeObj.FileIO
-			}
-         var chromeBaseUri = IO_SERVICE.newURI(this.chromeBase, null, null)
+		/*
+		 * Load all scripts from a directory 
+		 * @param in String chromePath: chrome path to directory which scripts should be loaded
+		 * @param in Object scopeObj: Object in which context the scripts are loaded
+		 * @param in Array excludeArray: Array with String or RegExp defining the files to exclude
+		 */
+		loadScripts: function(chromePath, scopeObj, excludeArray, recursive){
+			chromePath = chromePath.lastIndexOf("/")==chromePath.length-1?chromePath:chromePath+"/"
+         var chromeBaseUri = IO_SERVICE.newURI(chromePath, null, null)
          var chromeBaseFullUri = CHROME_REGISTRY.convertChromeURL(chromeBaseUri)
          var chromeBaseFile = chromeBaseFullUri.QueryInterface(Components.interfaces.nsIFileURL).file; 
+         var startIndexSubPath  = chromeBaseFile.target.length
          var dirIO = scopeObj.DirIO
-         var files = dirIO.read(chromeBaseFile)
+         var files = this.readFileEntries(chromeBaseFile, recursive)
          for (var i = 0; i < files.length; i++) {
          	var fullPath = files[i].target
-         	if(fullPath.lastIndexOf(".js")!=fullPath.length-3)
+         	if((fullPath.lastIndexOf(".js")!=fullPath.length-3) ||
+         	     this.shouldBeExcluded(files[i].leafName, excludeArray))
          	   continue
-         	this.loadScript(this.chromeBase + files[i].leafName, scopeObj)
+         	this.loadScript(chromeBaseUri.resolve(fullPath.substring(startIndexSubPath+1)), scopeObj) 
          }
-			this.setGlobalNamespaceObj(null)
 		},
 		
 		loadScript: function(url, scopeObj){
          JS_SCRIPT_LOADER.loadSubScript(url, scopeObj);
       },
       
-      loadSingleScript: function(pathFromBase, scopeObj){
-      	this.setGlobalNamespaceObj(scopeObj)
-      	this.loadScript(this.chromeBase + pathFromBase, scopeObj)
-      	this.setGlobalNamespaceObj(null)
+      loadSingleScript: function(chromePath, scopeObj){
+      	this.loadScript(chromePath, scopeObj)
       },
       
       path : function(file) {
 			return 'file:///'+ file.path.replace(/\\/g, '\/').replace(/^\s*\/?/, '').replace(/\ /g, '%20');
 		},
 		
-		setGlobalNamespaceObj: function(namespaceObj){
-		   DE_MOUSELESS_EXTENSION_NS = namespaceObj	
-		}
+		/*
+		 * @param in nsIFile directory: starting dir
+		 * @param in boolean
+		 * @param in array (optional): result array needed for recursion
+		 */
+		readFileEntries: function(directory, recursive, resultArray){
+			if(!directory.isDirectory())
+			   throw new Error('Param directory is not a directory')
+			if(resultArray==null)
+			   resultArray = new Array()
+			var dirEnumertor = directory.directoryEntries
+			while(dirEnumertor.hasMoreElements()){
+				var file = dirEnumertor.getNext().QueryInterface(Components.interfaces.nsIFile)
+				if(recursive && file.isDirectory())
+				  this.readEntries(file, recursive, resultArray)
+				else
+				  resultArray.push(file)
+			}
+			return resultArray
+		},
+		
+		shouldBeExcluded: function(fileName, excludeArray){
+      	for (var i = 0; i < excludeArray.length; i++) {
+      		var exclude = excludeArray[i]
+      		if((exclude.constructor==String && exclude==fileName) ||
+      		    (exclude.constructor==RegExp && excludeArray[i].test(fileName))){
+      		   return true
+      		}
+      	}
+      	return false
+	  }
+		
 	}
 
-	DE_MOUSELESS_EXTENSION_NS["ScriptLoader"] = ScriptLoader;
-})()
+	this["ScriptLoader"] = ScriptLoader;
+}).apply(this)
+}

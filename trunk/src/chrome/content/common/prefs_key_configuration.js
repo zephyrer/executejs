@@ -1,3 +1,4 @@
+with(this){
 const COMBINED_KEY_CODE_ATTR = "COMBINED_KEY_CODE_ATTR"
 function byId(elementId){
    return document.getElementById(elementId)
@@ -61,4 +62,5 @@ function setKeyboxFromKeyboxMenu(keyInputboxId, keyCombId){
    }else if(keyCombId=="SHIFT_TAB"){
      keyInputBox.setCombinedValue(9<<4|Event.SHIFT_MASK)
    }
+}
 }

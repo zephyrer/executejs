@@ -1,3 +1,4 @@
+with(this){
 /*
  * 
  * Common-Prefs Version 0.1 Created by Rudolf Noé 28.12.2007
@@ -5,7 +6,6 @@
  * Partly copied from pref-tabprefs.js (c) Bradley Chapman (THANKS!)
  */
 (function() {
-   var Constants = DE_MOUSELESS_EXTENSION_NS.Constants
    
 	// Attribute of a control under which key the preference should be stored
 	var ControlUtils = {
@@ -73,5 +73,6 @@
 		},
 		
 	}
-	DE_MOUSELESS_EXTENSION_NS["ControlUtils"]= ControlUtils;
-})()
+	this["ControlUtils"]= ControlUtils;
+}).apply(this)
+}

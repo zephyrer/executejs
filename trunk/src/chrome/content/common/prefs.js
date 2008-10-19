@@ -1,3 +1,4 @@
+with(this){
 /*
  * 
  * Common-Prefs Version 0.1 Created by Rudolf Noé 28.12.2007
@@ -5,9 +6,6 @@
  * Partly copied from pref-tabprefs.js (c) Bradley Chapman (THANKS!)
  */
 (function() {
-	
-	var ControlUtils = DE_MOUSELESS_EXTENSION_NS.ControlUtils
-	var XMLUtils = DE_MOUSELESS_EXTENSION_NS.XMLUtils
 	
 	// Attribute of a control under which key the preference should be stored
 	PREF_ID_ATTR = "prefid"
@@ -291,5 +289,6 @@
 			return result
 		}
 	}
-	DE_MOUSELESS_EXTENSION_NS["Prefs"] = Prefs;
-})()
+	this["Prefs"] = Prefs;
+}).apply(this)
+}

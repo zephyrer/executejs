@@ -1,3 +1,4 @@
+with(this){
 (function(){
 	var TabContextManager = {
       setContext: function(contentWin, contextId, context){
@@ -50,5 +51,6 @@
       }
 	}
 
-	DE_MOUSELESS_EXTENSION_NS["TabContextManager"] = TabContextManager;
-})()
+	this["TabContextManager"] = TabContextManager;
+}).apply(this)
+}

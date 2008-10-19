@@ -1,3 +1,4 @@
+with(this){
 (function(){   
    function ArrayList (arg){
    	if(arg!=null){
@@ -84,5 +85,6 @@
       
       
    }
-   DE_MOUSELESS_EXTENSION_NS["ArrayList"]= ArrayList;   
-})()
+   this["ArrayList"]= ArrayList;   
+}).apply(this)
+}

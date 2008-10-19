@@ -1,3 +1,4 @@
+with(this){
 (function(){
 	function Map(){
 		this.map = new Object()
@@ -57,5 +58,6 @@
 		
 	}
 
-	DE_MOUSELESS_EXTENSION_NS["Map"] = Map;
-})()
+	this["Map"] = Map;
+}).apply(this)
+}

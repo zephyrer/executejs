@@ -1,3 +1,4 @@
+with(this){
 (function(){
    function AbstractGenericTreeItem (){
    }
@@ -24,5 +25,6 @@
       
    }
 
-   DE_MOUSELESS_EXTENSION_NS["AbstractGenericTreeItem"] = AbstractGenericTreeItem;
-})()
+   this["AbstractGenericTreeItem"] = AbstractGenericTreeItem;
+}).apply(this)
+}

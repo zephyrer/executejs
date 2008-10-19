@@ -1,3 +1,4 @@
+with(this){
 /*
  * Version 0.1
  * Created by Rudolf Noé
@@ -7,7 +8,6 @@
  * As the XBL-extension of listboxes is buggy this solution was choosen
  */
 (function(){
-	var Constants = DE_MOUSELESS_EXTENSION_NS.Constants
 	var Listbox = {
 		VERSION: "0.2",
 		
@@ -83,6 +83,7 @@
          }
 		}
 	}
-	DE_MOUSELESS_EXTENSION_NS["Listbox"]= Listbox;
+	this["Listbox"]= Listbox;
 	
-})()
+}).apply(this)
+}

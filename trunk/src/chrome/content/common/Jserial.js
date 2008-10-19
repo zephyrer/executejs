@@ -1,3 +1,4 @@
+with(this){
 /* DotNetRemoting JavaScript Serializer/Deserializer
  * Orignial Author Dan Wellmann Thanks!!!
  * Downloaded from http://dotnetremoting.com/  
@@ -283,5 +284,6 @@
    		this.classes[key] = constructor
    	}
    }
-   DE_MOUSELESS_EXTENSION_NS["JSerial"] = JSerial;
-})()
+   this["JSerial"] = JSerial;
+}).apply(this)
+}

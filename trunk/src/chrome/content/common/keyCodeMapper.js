@@ -1,3 +1,4 @@
+with(this){
 /**
  * Keycode Mapper for ShortcutManager
  */
@@ -117,3 +118,5 @@ keyCodeMapper['220']='BACK_SLASH'
 keyCodeMapper['221']='CLOSE_BRACKET'
 keyCodeMapper['222']='QUOTE'
 keyCodeMapper['224']='META'
+
+}

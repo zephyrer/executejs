@@ -1,3 +1,4 @@
+with(this){
 /*
  * Version 0.1
  * Created by Rudolf Noé
@@ -50,5 +51,6 @@
 	    	}
 		}
 	}
-	DE_MOUSELESS_EXTENSION_NS["Namespace"] = Namespace;	
-})()
+	this["Namespace"] = Namespace;	
+}).apply(this)
+}
