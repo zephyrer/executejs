@@ -28,11 +28,25 @@ with(this){
 		getImageSrc : function(row, col) {
          return this.visibleItems.get(row).getImageSrc(col)
 		},
+      getIndexForItem: function(item){
+         for (var i = 0; i < this.visibleItems.size(); i++) {
+            var item = this.visibleItems.get(i)
+            if(item==item)
+               return i
+         }
+         return -1
+      },
 		getLevel : function(row) {
          return this.visibleItems.get(row).getLevel()
 		},
 		getRowProperties : function(row, props) {
 		},
+      getSelectedItem: function(){
+         if(this.tree.currentIndex==-1)
+            return null
+         else
+            return this.visibleItems.get(this.tree.currentIndex)
+      },
 		getTreeBox: function(){
 			return this.treebox
 		},
@@ -54,15 +68,19 @@ with(this){
 		isSorted : function() {
 			return false;
 		},
-		removeItem: function(index){
+		removeAtIndex: function(index){
 			this.visibleItems.removeAtIndex(index)
 			this.updateRowCount()
 			this.rowCountChanged(index, -1)
 		},
+      removeItem: function(item){
+         var index = this.getIndexForItem(item)
+         this.removeAtIndex(index)
+      },
       removeSelected: function(){
          if(this.tree.currentIndex==-1)
             return
-         this.removeItem(this.tree.currentIndex)
+         this.removeAtIndex(this.tree.currentIndex)
       },
 		rowCountChanged: function(index, count){
       	if(this.treebox==null)

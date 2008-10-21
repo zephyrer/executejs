@@ -21,7 +21,6 @@ with(this){
          var chromeBaseFullUri = CHROME_REGISTRY.convertChromeURL(chromeBaseUri)
          var chromeBaseFile = chromeBaseFullUri.QueryInterface(Components.interfaces.nsIFileURL).file; 
          var startIndexSubPath  = chromeBaseFile.target.length
-         var dirIO = scopeObj.DirIO
          var files = this.readFileEntries(chromeBaseFile, recursive)
          for (var i = 0; i < files.length; i++) {
          	var fullPath = files[i].target
@@ -58,7 +57,7 @@ with(this){
 			while(dirEnumertor.hasMoreElements()){
 				var file = dirEnumertor.getNext().QueryInterface(Components.interfaces.nsIFile)
 				if(recursive && file.isDirectory())
-				  this.readEntries(file, recursive, resultArray)
+				  this.readFileEntries(file, recursive, resultArray)
 				else
 				  resultArray.push(file)
 			}
@@ -66,6 +65,8 @@ with(this){
 		},
 		
 		shouldBeExcluded: function(fileName, excludeArray){
+			if(excludeArray==null)
+			   return false
       	for (var i = 0; i < excludeArray.length; i++) {
       		var exclude = excludeArray[i]
       		if((exclude.constructor==String && exclude==fileName) ||

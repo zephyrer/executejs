@@ -17,6 +17,10 @@ with(this){
    	
    	defaultString: function(string){
    		return string!=null?string:""
+   	},
+   	
+   	trim: function(string){
+   		return string.replace(/^\s*/, "").replace(/\s*$/, "")
    	}
    }
    this["StringUtils"] = StringUtils
