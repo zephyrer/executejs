@@ -6,6 +6,8 @@ with(this){
  */
 
 (function(){
+	
+const COMBINED_KEY_CODE_REG_EXP = /^[kc]{1}\d*$/
 
 /*
  * Constructor
@@ -15,29 +17,31 @@ with(this){
  */
 //TODO different event types
 function ShortcutManager(targetObject, eventType, suppressShortcutKeys){
-    this.shortcuts = new Object();
-    this.currentEvent = null;
-    this.suppressShortcutKeys = suppressShortcutKeys!=null?suppressShortcutKeys:false
-    this.windowKeyEventHandler = new KeyEventHandler(this, "handleWindowEvent")
-    this.elementKeyEventHandler = new KeyEventHandler(this, "handleElementEvent")
-    targetObject.addEventListener("keydown", this.windowKeyEventHandler, true);
+   this.targetObject = targetObject
+   this.eventType  = eventType
+   this.suppressShortcutKeys = suppressShortcutKeys!=null?suppressShortcutKeys:false
+   this.shortcuts = new Object();
+   this.currentEvent = null;
+   this.windowKeyEventHandler = new KeyEventHandler(this, "handleWindowEvent")
+   this.elementKeyEventHandler = new KeyEventHandler(this, "handleElementEvent")
+   this.targetObject.addEventListener(this.eventType, this.windowKeyEventHandler, true);
 }
 
 ShortcutManager.prototype = {
    //Main event listening method
    handleWindowEvent : function(event) {
-      this.onEvent(event)
+      this.handleEvent(event)
    },
    
    handleElementEvent: function(event){
       var srcElement = event.target;
       if(srcElement.id)
-         this.onEvent(event, srcElement.id)
+         this.handleEvent(event, srcElement.id)
       else 
-         this.onEvent(event, srcElement.name);
+         this.handleEvent(event, srcElement.name);
    },
    
-   onEvent: function(event, elementId){
+   handleEvent: function(event, elementId){
       var shortcutKey = this.encodeEvent(event, elementId);
       if (elementId)
          shortcutKey = elementId + "_" + shortcutKey;
@@ -45,7 +49,7 @@ ShortcutManager.prototype = {
       if (shortcutArray) {
          this.currentEvent = event;
          for (var i = 0; i < shortcutArray.length; i++) {
-            var result = shortcutArray[i].onEvent(event);
+            var result = shortcutArray[i].handleEvent(event);
             if(this.suppressShortcutKeys || result&ShortcutManager.SUPPRESS_KEY){
                event.preventDefault();
                event.stopPropagation();
@@ -63,20 +67,33 @@ ShortcutManager.prototype = {
     * Adds JS shortcut
     * @param combinedKeyCode: combinedKeyCode = keyCode << 4 | Event.ALT_MASK | Event.CONTROL_MASK | Event.SHIFT_MASK | Event.META_MASK 
     *    @see createCominedKeyCode
-    * @param shortcutTarget: Could be string with java script code, shortcut object implementing the onEvent method, a function or 
+    * @param shortcutTarget: Could be string with java script code, shortcut object implementing the handleEvent method, a function or 
     *    an eventhanlder object implementing the handleEvent-method
     * @param cliendId: id with which the shortcut can be removed 
     */
-   addShortcut: function(combinedKeyCode, shortcutTarget, clientId){
+   addShortcut: function(keyCombination, shortcutTarget, targetObj, clientId){
+      if(this.destroyed)
+         throw new Error('Shortcutmananger already destroyed')
+   	var combinedKeyCode = null
+   	if(!isNaN(keyCombination)){
+   		combinedKeyCode = keyCombination
+//   	}else if(COMBINED_KEY_CODE_REG_EXP.test(keyCombination)){
+//   		combinedKeyCode = keyCombination
+   	}else if(typeof keyCombination=="string"){
+   		combinedKeyCode = this.parseKeyCombination(keyCombination)
+   	}else{
+   		throw new Error('Wrong key combinatin provided')
+   	}
    	var shortcut = null
    	if(shortcutTarget.constructor == String){//instanceof doesn't work
    		shortcut = new JsShortcut(shortcutTarget, clientId)
-   	}else if(shortcutTarget.onEvent instanceof Function){
-   		shortcut = shortcutTarget
-   	}else if(shortcutTarget instanceof Function || 
-   	     (shortcutTarget!=null &&  shortcutTarget.handleEvent instanceof Function)){
-   	  shortcut = new FunctionShortcut(shortcutTarget, clientId)     	
+   	}else if(typeof shortcutTarget == "function" || 
+   	     (shortcutTarget!=null && typeof shortcutTarget.handleEvent == "function")){
+   	  shortcut = new FunctionShortcut(shortcutTarget, targetObj, clientId)     	
+   	}else{
+   	  throw new Error('shortcutTarget is neither String nor Function or EventHandler')	
    	}
+   	
       var shortcutArray = this.shortcuts[combinedKeyCode];
       if(shortcutArray==null)
          this.shortcuts[combinedKeyCode] = new Array(shortcut);
@@ -89,7 +106,7 @@ ShortcutManager.prototype = {
            modifierMask = 0;
        }
        var combinedKeyCode = this.createShortcutKey(keyCode, modifierMask)       
-       this.addShortcut(combinedKeyCode, jsCode, clientId)
+       this.addShortcut(combinedKeyCode, jsCode, null, clientId)
    },
    
    /*
@@ -100,7 +117,7 @@ ShortcutManager.prototype = {
     * @param cliendId: id with which the shortcut can be removed 
     */
    addJsShortcutWithCombinedKeyCode: function(combinedKeyCode, jsCode, clientId){
-       this.addShortcut(combinedKeyCode, jsCode, clientId);
+       this.addShortcut(combinedKeyCode, jsCode, null, clientId);
    },
    
    /*
@@ -111,7 +128,7 @@ ShortcutManager.prototype = {
       if(!element)
          throw new Error("Element for elementId does not exist");
       var shortcutKey = this.createShortcutKey(keyCode, modifierMask, elementId)
-      this.addShortcut(shortcutKey, jsCode, clientId)
+      this.addShortcut(shortcutKey, jsCode, null, clientId)
       element.addEventListener("keydown", this.elementKeyEventHandler, true);
    },
    
@@ -133,7 +150,7 @@ ShortcutManager.prototype = {
                if(shortcut.clientId!=clientId)
                   newShortcutArray[newShortcutArray.length] = shortcut;
             }
-            shortcuts[i] = newShortcutArray;
+            this.shortcuts[i] = newShortcutArray;
          }
       }catch(e){alert(e)}
    },
@@ -163,8 +180,37 @@ ShortcutManager.prototype = {
            event.metaKey * Event.META_MASK;
    },
    
+   destroy: function(){
+      this.targetObject.removeEventListener(this.eventType, this.windowKeyEventHandler, true);
+      this.targetObject.removeEventListener(this.eventType, this.elementKeyEventHandler, true);
+      this.shortcuts = null
+      this.destroyed = true
+   },
+   
    isModifierCombination: function(event, modifierCombination){
        return this.encodeEventModifier(event)==modifierCombination
+   },
+   
+   parseKeyCombination: function(keyCombination){
+      var parts = keyCombination.split("+")
+      var keyPart = StringUtils.trim(parts.pop()).toUpperCase()
+      var keyCode = KeyEvent["DOM_VK_"+keyPart]
+      var modifierMask = 0
+      for (var i = 0; i < parts.length; i++) {
+      	var modifier = StringUtils.trim(parts[i]).toUpperCase()
+      	switch(modifier){
+      		case "CTRL":
+      		   modifierMask = modifierMask | ShortcutManager.CTRL
+      		   break;
+      		case "SHIFT": 
+      		   modifierMask = modifierMask | ShortcutManager.SHIFT
+      		   break;
+      		case "ALT": 
+      		   modifierMask = modifierMask | ShortcutManager.ALT
+      		   break;
+      	}
+      }
+      return this.createCombinedKeyCode(keyCode, modifierMask)
    }
 }
 
@@ -199,26 +245,29 @@ function JsShortcut(jsCode, clientId){
 }
 
 JsShortcut.prototype = new AbstractShortcut()
-JsShortcut.prototype.onEvent = function(event){
+JsShortcut.prototype.handleEvent = function(event){
        return window.eval(this.jsCode);
 }
 
 //Shortcut for function pointer or event handler
-function FunctionShortcut(eventHandler, clientId){
-   if(!(eventHandler instanceof Function) &&
-      !(eventHandler.handleEvent instanceof Function)){
+function FunctionShortcut(eventHandler, targetObj, clientId){
+   if(!(typeof eventHandler == "function") &&
+      !(typeof eventHandler.handleEvent == "function")){
       throw new Error("FunctionShortcut.constructor: eventhandler must be function or must implement eventhandler interface")   	
    }
    this.AbstractShortcut(clientId)
-   
    this.eventHandler = eventHandler
+   this.targetObj = targetObj
 }
 
 FunctionShortcut.prototype = AbstractShortcut.prototype
 
-FunctionShortcut.prototype.onEvent = function(event){
-	if(this.eventHandler instanceof Function){
-      return this.eventHandler(event)
+FunctionShortcut.prototype.handleEvent = function(event){
+	if(typeof this.eventHandler == "function"){
+		if(this.targetObj==null)
+         return this.eventHandler(event)
+      else
+         return this.eventHandler.apply(this.targetObj)
 	}else{
 		return this.eventHandler.handleEvent(event)
 	}

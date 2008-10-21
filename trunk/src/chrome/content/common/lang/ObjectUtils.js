@@ -136,7 +136,7 @@ with(this){
    	},
    	
    	//Checks wether obj has all functions of constructor
-   	isInstanceOf: function(obj, constructorFunc){
+   	instanceOf: function(obj, constructorFunc){
    		var proto = constructorFunc.prototype
    		for(var m in proto){
    			var value = proto[m]
