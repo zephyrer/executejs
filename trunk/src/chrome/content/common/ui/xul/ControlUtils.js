@@ -22,13 +22,6 @@ with(this){
          menulist.menupopup.appendChild(newItem)
 		},
 		
-		clearMenulist: function(menulist){
-		   var menupopup = menulist.menupopup
-		   while(menupopup.hasChildNodes()){
-		   	menupopup.removeChild(menupopup.firstChild)
-		   }
-		},
-		
 		/*
 		 * Adds menuitems for a array of labels and values, 
 		 * Only new items with different values will be added 
@@ -49,6 +42,59 @@ with(this){
 		   	menulist.appendItem(labelArray[i], value, null)
 		   }
 		},
+		
+		clearMenulist: function(menulist){
+		   var menupopup = menulist.menupopup
+		   while(menupopup.hasChildNodes()){
+		   	menupopup.removeChild(menupopup.firstChild)
+		   }
+		},
+      
+      filterMenulist: function(menulist, value){
+         if(value==null)
+            value = menulist.value
+         value = value.toLowerCase()
+         var parts = value.split(" ")
+         var menuitemsFit = new Array()
+         for (var i = 0; i < menulist.itemCount; i++) {
+            var fit = true
+            var menuitem = menulist.getItemAtIndex(i)
+            var startindex = 0
+            for (var j = 0; j < parts.length; j++) {
+               var menuItemValue = (menuitem.value?menuitem.value:menuitem.label).toLowerCase()
+               startindex = menuItemValue.indexOf(parts[j], startindex)
+               if(startindex==-1){
+                  fit = false
+                  break
+               }
+               startindex += parts[j].length
+            }
+            if(!fit)
+               menuitem.style.display = "none"
+            else{
+               menuitem.style.display = "block"
+               menuitemsFit.push(menuitem)
+            }
+         }
+      },
+      
+      observeControl: function(control, callbackFunc, thisObj){
+         var callBack = Utils.bind(callbackFunc, thisObj)
+         var tagName = control.tagName.toLowerCase() 
+         if(tagName=="menulist" || "colorfield"){
+            control.addEventListener("select", function(){
+               callBack(control, control.value)
+            }, true)
+         }
+         if(tagName=="textbox" || tagName=="menulist" || tagName=="colorfield"){
+            control.addEventListener("input", function(){
+               callBack(control, control.value)
+            }, true)
+            Utils.observeObject(control, "value", function(newValue){
+               callBack(control, newValue)
+            })
+         }
+      },
 		
 		/*
 		 * Selects item of menulist by its value and returns the item 

@@ -7,6 +7,7 @@ with(this){
       		throw new Error("TabContext could not be set as content win doesn't match to browser")
       	}
       	tabContext.setContext(contextId, context)
+         return context
       },
       
       getContext: function(contentWin, contextId){

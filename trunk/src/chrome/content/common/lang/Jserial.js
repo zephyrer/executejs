@@ -229,6 +229,7 @@ with(this){
       			return parseFloat(Text, 10);
       			
       		case "bool":
+      		case "boolean":
       			{
       				if (Text == "true" || Text == "True")
       				{

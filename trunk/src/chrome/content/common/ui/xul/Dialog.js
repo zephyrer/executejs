@@ -10,11 +10,12 @@ with(this){
 		OK:"OK",
 		CANCEL:"CANCEL"
 	}
+   this.DialogResult = DialogResult
 
-	function Dialog(url, name, model, parentWin, features, argObj){
+	function Dialog(url, name, modal, parentWin, features, argObj){
 		this.url = url
 		this.name = name
-		this.model = model
+		this.modal = modal
 		this.parentWin = parentWin
 		this.features = features
 		this.argObj = argObj
@@ -25,6 +26,14 @@ with(this){
 		addEventListener: function(listener){
         this.listeners.add(listener) 			
 		},
+      
+      getNamedResult: function(key){
+         return this.dialogContext.resultObj[key]
+      },
+      
+      getResult: function(){
+         return this.dialogContext.result 
+      },
 		
 		informListeners: function(){
 		   for (var i = 0; i < this.listeners.size(); i++) {
@@ -39,10 +48,14 @@ with(this){
 			this.features = features
 		},
 		
-		open: function(){
-			this.dialogContext = new DialogContext(this.argObj, {})
-			this.dialog = partentWin.openDialog(this.url, this.name, (modal?"model=yes,":"") + this.features, this.dialogContext)
-			if(modal){
+		show: function(){
+			this.dialogContext = new DialogContext(this.argObj)
+			this.dialog = this.parentWin.openDialog(this.url, this.name, 
+                                                (this.modal?"modal=yes,":"") + 
+                                                (this.features?this.features:"") + 
+                                                ", centerscreen=yes", 
+                                                this.dialogContext)
+			if(this.modal){
 				this.informListeners();
 			}else{
 				this.dialog.addEventListener("unload", Utils.bind(this.informListeners, this), true)
@@ -51,6 +64,8 @@ with(this){
 	}
 	
 	Dialog.getNamedArgument = function(key){
+      if(!window.arguments || !window.arguments[0] || !window.arguments[0].argObj)
+         throw new Error('No argument set')
 		return window.arguments[0].argObj[key]
 	}
 	
@@ -59,16 +74,20 @@ with(this){
 	}
 	
 	Dialog.setNamedResult = function(key, value){
-		window.arguments[0][key]=value
+		window.arguments[0].resultObj[key]=value
 	}
+   
+   Dialog.setResult = function(result){
+      window.arguments[0].result = result
+   }
 	
-	function DialogContext(argObj, resultObj){
+	function DialogContext(argObj){
 		this.argObj = argObj
-		this.resultObj = resultObj
+		this.resultObj = new Object
 		this.result = DialogResult.CANCEL
 	}
    
-	
 	this.Dialog = Dialog;
+   
 }).apply(this)
 }
