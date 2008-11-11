@@ -267,9 +267,9 @@ with (this) {
 						oldValue, newValue) {
 					setTimeout(function() {
 						if (thisObj)
-							callbackFunction.apply(thisObj)
+							callbackFunction.apply(thisObj, newValue)
 						else
-							callbackFunction()
+							callbackFunction(newValue)
 					})
 					return newValue
 				})
@@ -285,13 +285,12 @@ with (this) {
 				if (this.executeDelayedTimerMap[timerId] != null) {
 					clearTimeout(this.executeDelayedTimerMap[timerId])
 				}
-				this.executeDelayedTimerMap[timerId] = setTimeout(function(
-						tabLocalPrefsRef) {
+				this.executeDelayedTimerMap[timerId] = setTimeout(function() {
 					if (thisObj != null)
 						functionPointer.apply(thisObj)
 					else
 						functionPointer()
-					tabLocalPrefsRef.executeDelayedTimerMap[timerId] = null
+					Utils.executeDelayedTimerMap[timerId] = null
 				}, delay, this)
 			},
 

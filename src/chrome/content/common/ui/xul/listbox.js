@@ -19,6 +19,14 @@ with(this){
 		getItems: function(listbox){
 			return listbox.getElementsByTagName("listitem");
 		},
+      
+      getItemByValue: function(listbox, value){
+         var items = this.getItems(listbox)
+         for (var i = 0; i < items.length; i++) {
+            if(items[i].value==value)
+               return items[i]
+         }
+      }, 
 		
 		getSelectedListCells: function(listbox){
 			if(listbox.selectedIndex==-1){
@@ -27,6 +35,20 @@ with(this){
 			var selectedItem = listbox.getItemAtIndex(listbox.selectedIndex)
 			return selectedItem.getElementsByTagName('listcell')
 		},
+      
+      getValues: function(listbox){
+         var result = new Array()
+         var items = this.getItems(listbox)
+         for (var i = 0; i < items.length; i++) {
+            var itemArray = new Array()
+            var listcells = items[i].getElementsByTagName('listcell')
+            for (var j = 0; j < listcells.length; j++) {
+               itemArray.push(listcells[j].getAttribute('value'))
+            }
+            result.push(itemArray)
+         }
+         return result
+      },
 		
 		/*
 		 * Appends a row to a mulicolumn listbox

@@ -42,11 +42,62 @@ with(this){
          return link;
       },
 
-      //Taken from firebug, see firebug-license.txt
+      //Taken from firebug and modified, see firebug-license.txt
       getBody : function(doc) {
          if (doc.body)
             return doc.body;
-         return doc.getElementsByTagName("body")[0];
+         var bodyElems = doc.getElementsByTagName("body")
+         return bodyElems.length>0?bodyElems[0]:null
+      },
+      
+      getChildrenBy: function(element, testFunction){
+         var result = new Array()
+         var childNodes = element.childNodes
+         for (var i = 0; i < childNodes.length; i++) {
+            if(testFunction(childNodes[i]))
+               result.push(childNodes[i])
+         }
+         return result
+      },
+      
+      getElementType: function(element){
+         if(!element || !element.tagName)
+               return null;
+         var tagName = element.tagName
+         var type = element.type?element.type.toLowerCase():""
+
+         if(tagName == "INPUT"){
+            if(type=="text")
+               return HtmlElementType.TEXT
+            else if(type=="password")
+               return HtmlElementType.PASSWORD
+            else if(type=="radio")
+               return HtmlElementType.RADIO
+            else if(type=="checkbox")
+               return HtmlElementType.CHECKBOX
+            else if(type=="file")
+               return HtmlElementType.FILE
+         }else if(tagName == "SELECT")
+            return HtmlElementType.SELECT
+         else if(tagName == "TEXTAREA")
+            return HtmlElementType.TEXTAREA
+         else if(tagName == "BUTTON" || 
+            (tagName == "INPUT" && ( type == "button" || type == "submit" || type == "reset" || type == "image"))){
+            return HtmlElementType.BUTTON
+         } else {
+            return HtmlElementType.OTHER
+         }
+      },
+      
+      getFirstChildBy: function(element, testFunction){
+         if(!element.hasChildNodes())
+            return null
+         var children = element.childNodes
+         for (var i = 0; i < children.length; i++) {
+            if(testFunction(children[i]))
+               return children[i]
+         }
+         return null;
       },
       
       getFrameByName: function(win, name){
@@ -76,6 +127,16 @@ with(this){
          return result
       },
 
+      getNextElementSibling: function(element){
+         var node = element.nextSibling 
+         while(node){
+            if(node.nodeType==1)
+               break
+            node = node.nextSibling
+         }
+         return node
+      },
+      
       /*
        * @param element: element for which offset should be computed @param
        * leftOrTop: values offsetLeft/offsetTop
@@ -94,6 +155,23 @@ with(this){
       
       getOwnerWindow: function(element){
       	return element.ownerDocument.defaultView
+      },
+      
+      getPreviousElementSibling: function(element){
+         var node = element.previousSibling 
+         while(node){
+            if(node.nodeType==1)
+               break
+            node = node.previousSibling
+         }
+         return node
+      },
+
+      isFramesetWindow: function(win){
+         if(this.getBody(win.document)==null && win.doc.getElementsByTagName('frameset').length>0)
+            return true
+         else
+            return false
       },
       
       iterateDescendantsByTagName: function(element, descendantTagName, funcPointer){
@@ -133,11 +211,34 @@ with(this){
          return body.localName.toUpperCase() == "FRAMESET"
       },
       
+      removeElement: function(element){
+         var parentNode = element.parentNode
+         if(!parentNode)
+            return false
+         return parentNode.removeChild(element) 
+      },
+      
       resizeTo: function(elt, w, h){
          elt.style.width = w + "px"
          elt.style.height = h + "px"
       }
    }
-this["DomUtils"] = DomUtils;
+   this["DomUtils"] = DomUtils;
+   
+   HtmlElementType = {
+      BUTTON: "BUTTON",
+      CHECKBOX: "CHECKBOX",
+      FIELDSET: "FIELDSET",
+      FILE: "FILE",
+      IFRAME: "IFRAME",
+      OTHER: "OTHER",
+      PASSWORD: "PASSWORD",
+      RADIO: "RADIO",
+      SELECT: "SELECT",
+      TEXT: "TEXT",
+      TEXTAREA: "TEXTAREA",
+   }
+   this["HtmlElementType"] = HtmlElementType
+      
 }).apply(this)
 }

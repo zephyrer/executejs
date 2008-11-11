@@ -53,6 +53,15 @@ with(this){
 		getVisibleItems: function(){
 			return this.visibleItems
 		},
+      invalidateRow: function(indexOrItem){
+         var index = indexOrItem
+         if(isNaN(indexOrItem))
+            index = this.getIndexForItem(indexOrItem)
+         if(index==-1)
+            throw new Error("Row for param " + indexOrItem + " not found")
+         this.getTreeBox().invalidateRow(index)
+            
+      },
 		isContainer : function(row) {
          return this.visibleItems.get(row).isContainer()
 		},

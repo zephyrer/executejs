@@ -96,7 +96,7 @@ with(this){
       extend : function(constructorSubClass, constructorSuperclass) {
          function copyMembers(source, target){
             for (var member in source) {
-               if(!target.prototype[member]){
+               if(!target.prototype.hasOwnProperty(member)){
                  target.prototype[member] = source[member]
                }
             }
