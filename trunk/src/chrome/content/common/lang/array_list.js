@@ -55,6 +55,10 @@ with(this){
       	}
       	return this.array[index]
       },
+      
+      indexOf: function(obj){
+         return this.array.indexOf(obj)   
+      },
 
       removeAtIndex: function(index){
       	this.array = this.array.slice(0,index).concat(this.array.slice(index+1))

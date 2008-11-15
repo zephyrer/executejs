@@ -274,7 +274,15 @@ with (this) {
 					return newValue
 				})
 			},
-
+         
+         watchProperty : function(objectToObserve, propertyToObserve, callbackFunction, thisObj) {
+            this.observeObject(objectToObserve, propertyToObserve, callbackFunction, thisObj)
+         },
+         
+         unwatchProperty : function(objectToObserve, propertyToObserve){
+            objectToObserve.unwatch(propertyToObserve)
+         },
+         
 			/*
 			 * Execute the provided funtion after the provided delay being in
 			 * that the function is not called another time within the provided
