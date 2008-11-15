@@ -1,60 +1,53 @@
 with(this){
 (function(){
 	function Map(){
-		this.map = new Object()
+      this.keyList = new ArrayList()
+      this.valueList = new ArrayList()
 	}
 	
 	Map.prototype = {
 		constructor: Map,
 		clear: function(){
-		   for(var key in this.map){
-		   	delete this.map[key]
-		   }
+		   this.keyList = new ArrayList()
+		   this.valueList = new ArrayList()
 		},
 		
 		containsKey: function(key){
-		   return this.map.hasOwnProperty(key)	
+		   return this.keyList.contains(key)	
 		},
 		
 		containsValue: function(obj){
-			for (var key in this.map){
-				if(this.map[key]==obj){
-					return true
-				}
-			}
-			return false
+		   return this.valueList.contains(obj)	
 		},
 		
 		get: function(key){
-			return this.map[key]
+			var index = this.keyList.indexOf(key)
+         if(index==-1)
+            return null
+         else
+            return this.valueList.get(index)
 		},
 		
 		keys: function(){
-			var arr = new Array()
-			for(var key in this.map){
-				arr.push(key)
-			}
-			return arr
+			return this.keyList.toArray()
 		},
 		
 		put: function(key, value){
-			this.map[key] = value
+         this.keyList.add(key)
+         this.valueList.add(value)
 		},
 		
 		remove: function(key){
-			var result = this.map[key]
-			delete this.map[key]
-			return result
+         var index = this.keyList.indexOf(key)
+         if(index!=-1){
+            this.keyList.removeAtIndex(index)
+            this.valueList.removeAtIndex(index)
+         }
 		},
 		
 		values: function(){
-         var arr = new Array()
-         for(var key in this.map){
-            arr.push(this.map[key])
-         }
-         return arr
+         return this.valueList.toArray()
 		}
-		
 		
 	}
 

@@ -28,10 +28,10 @@ with(this){
 		getImageSrc : function(row, col) {
          return this.visibleItems.get(row).getImageSrc(col)
 		},
-      getIndexForItem: function(item){
+      getIndexForItem: function(aItem){
          for (var i = 0; i < this.visibleItems.size(); i++) {
             var item = this.visibleItems.get(i)
-            if(item==item)
+            if(item==aItem)
                return i
          }
          return -1

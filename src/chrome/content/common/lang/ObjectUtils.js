@@ -9,6 +9,7 @@ with(this){
 		REG_EXP: "RegExp",
 		STRING: "String"
 	}
+   this["BasicObjectTypes"] = BasicObjectTypes;
 	
 	var ObjectUtils = {
 		deepClone: function(obj){
