@@ -11,13 +11,15 @@ const COMBINED_KEY_CODE_REG_EXP = /^[kc]{1}\d*$/
 
 /*
  * Constructor
- * @param targetObject: object on which the key event listener will be installed
+ * @param targetObject: object on which the key event listener will be installed or array of objects
  * @param eventType: type of event on which should be listened ("keydown", "keypress"
  * @param suppressKey: boolean indicating whether the the default behavior of key resulting in a shortcut should be suppressed
  */
 //TODO different event types
-function ShortcutManager(targetObject, eventType, suppressShortcutKeys, useCapture){
-   this.targetObject = targetObject
+function ShortcutManager(targetObjects, eventType, suppressShortcutKeys, useCapture){
+   if(targetObjects.constructor.toString().indexOf("function Array")==-1)
+      targetObjects = new Array(targetObjects)
+   this.targetObjects = targetObjects
    this.eventType  = arguments.length>=2?eventType:"keydown"
    this.suppressShortcutKeys = arguments.length>=3?suppressShortcutKeys:true
    this.useCapture = arguments.length>=4?useCapture:true
@@ -26,7 +28,9 @@ function ShortcutManager(targetObject, eventType, suppressShortcutKeys, useCaptu
    this.elementsWithShortcuts = new Array()
    this.windowKeyEventHandler = new KeyEventHandler(this, "handleWindowEvent")
    this.elementKeyEventHandler = new KeyEventHandler(this, "handleElementEvent")
-   this.targetObject.addEventListener(this.eventType, this.windowKeyEventHandler, this.useCapture);
+   for (var i = 0; i < this.targetObjects.length; i++) {
+      this.addEventListenerToTarget(this.targetObjects[i]);
+   }
 }
 
 ShortcutManager.prototype = {
@@ -63,6 +67,10 @@ ShortcutManager.prototype = {
       } else {
          this.currentEvent = null;
       }
+   },
+   
+   addEventListenerToTarget: function(targetObj){
+      targetObj.addEventListener(this.eventType, this.windowKeyEventHandler, this.useCapture);
    },
    
    /*
@@ -158,6 +166,11 @@ ShortcutManager.prototype = {
       this.addShortcutForElement(elementId, shortcutKey, jsCode, null, clientId)
    },
    
+   addTargetObject: function(obj){
+      this.targetObjects.push(obj)
+      this.addEventListenerToTarget(obj)
+   },
+   
    /*
     * Löscht alle Shortcuts mit einer bestimmten
     * ClientId
@@ -207,9 +220,11 @@ ShortcutManager.prototype = {
    },
    
    destroy: function(){
-      this.targetObject.removeEventListener(this.eventType, this.windowKeyEventHandler, true);
+      for (var i = 0; i < this.targetObjects.length; i++) {
+         this.targetObjects[i].removeEventListener(this.eventType, this.windowKeyEventHandler, this.useCapture);
+      }
       for (var i = 0; i < this.elementsWithShortcuts.length; i++) {
-         this.elementsWithShortcuts[i].removeEventListener(this.eventType, this.elementKeyEventHandler, true);
+         this.elementsWithShortcuts[i].removeEventListener(this.eventType, this.elementKeyEventHandler, this.useCapture);
       }
       this.shortcuts = null
       this.destroyed = true
@@ -313,7 +328,7 @@ function CommandShortcut(commandElement,  clientId){
 CommandShortcut.prototype = new AbstractShortcut()
 
 CommandShortcut.prototype.handleEvent = function(event){
-   if(!this.commandElement.disabled)
+   if(this.commandElement.getAttribute('disabled')=="false")
       this.commandElement.doCommand()
 }
 this["CommandShortcut"] = CommandShortcut;
