@@ -5,7 +5,7 @@
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="{7067a92c-1db4-4e5e-869c-25f841287f8b}"
                    em:name="Execute JS"
-                   em:version="0.2.1"
+                   em:version="0.2.2"
                    em:creator="Rudolf Noe"
                    em:description="Excute JS"
                    em:homepageURL="http://www.mouseless.de/index.php?/content/view/18/31/"
