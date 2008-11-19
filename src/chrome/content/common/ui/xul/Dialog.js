@@ -62,6 +62,17 @@ with(this){
 			}
 		}
 	}
+   
+   Dialog.acceptDialog = function(){
+      Dialog.getDialog().acceptDialog()
+   }
+   
+   Dialog.getDialog = function(){
+      var dialogs = document.getElementsByTagName('dialog')
+      if(dialogs.length!=1)
+         throw new Error('No or to much dialog elements')
+      return dialogs[0]
+   }
 	
 	Dialog.getNamedArgument = function(key){
       if(!window.arguments || !window.arguments[0] || !window.arguments[0].argObj)

@@ -38,7 +38,7 @@ with(this){
          if(elements.length>1){
             throw new Error ('Bug in createXPath: Result is not unique. XPathExp: ' + result)
          }else if(elements.length==0){
-            throw new Error ('Bug in createXPath: Result is empty')
+            throw new Error ('Bug in createXPath: Result is empty. XPathExp: ' + result)
          }
 			return result
 		},
