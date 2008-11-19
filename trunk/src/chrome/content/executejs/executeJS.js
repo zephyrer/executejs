@@ -144,9 +144,21 @@ function EJS_getSelectedWin(){
 }
 
 function EJS_commitContextMenu(event){
-	rno_common.Utils.copyToClipboard(event.target.value)
+   var valueToInsert = event.target.value
+	var selectionEnd = EJS_cntJsCode.selectionStart + valueToInsert.length;
+	var currentValue = EJS_cntJsCode.value;
+	var beforeText = currentValue.substring(0, EJS_cntJsCode.selectionStart);
+	var afterText = currentValue.substring(EJS_cntJsCode.selectionEnd,
+			currentValue.length);
+
+	EJS_cntJsCode.value = beforeText + valueToInsert + afterText;
+	EJS_cntJsCode.focus();
+
+	// put the cursor after the inserted text
+	EJS_cntJsCode.setSelectionRange(selectionEnd, selectionEnd);
+   //rno_common.Utils.copyToClipboard(event.target.value)
 	//Timeout needed otherwise clipboard isn't filled yet
-	setTimeout("EJS_cntJsCode.editor.paste(1)", 100);	
+	//setTimeout("EJS_cntJsCode.editor.paste(1)", 100);	
 }
 
 function EJS_executeJS(){
@@ -177,8 +189,10 @@ function EJS_evalStringOnTarget(string){
 	var evalString = EJS_replaceShortcuts(string);
 	var contentWin = null
 	if(EJS_cntContentWinCB.checked==true && EJS_cntContentWinCB.disabled==false){
-		contentWin = EJS_currentTargetWin.getBrowser().contentWindow.wrappedJSObject
-		return contentWin.eval(evalString, contentWin)
+      var win = EJS_currentTargetWin.content.wrappedJSObject
+      var sb = new Components.utils.Sandbox(win)
+      sb.window = win
+      return Components.utils.evalInSandbox("with(window){" + evalString + "}", sb)
 	}else{
       return EJS_currentTargetWin.eval(evalString)
 	}	
@@ -357,51 +371,45 @@ function EJS_codeCompletion(){
 		try{
 		var evalObj = EJS_evalStringOnTarget(objString)
 		}catch(e){
-			alert(e)
-			error = true
+			EJS_appendToConsole(e.message)
+			return
 		}
 	}
-	if (error) {
+	//2 dim: label, value
+	var menuArray = new Array()
+	var i = 0;
+	for(prop in evalObj) {
+		if(attrPrefix.length!=0 && prop.indexOf(attrPrefix)!=0){
+			continue;
+		}
+		var miLabel = prop
+		try{
+			if(typeof evalObj[prop] == "function"){
+				miLabel += "()"
+			}
+		}catch(e){
+			//on props error occurs on typeof operator!!
+		}
+		var miValue = miLabel				
+		if(attrPrefix.length>0){
+			//Shorten for later pasting into textbox
+			miValue = miLabel.substring(attrPrefix.length)
+		}
+		menuArray[i] = [miLabel, miValue]
+		i++
+	}
+	menuArray.sort()
+	for(var i=0; i<menuArray.length; i++) {
 		var mi = document.createElement("menuitem")
-		mi.setAttribute("label", "Object could not be determined")
+		mi.setAttribute("label", menuArray[i][0])
+		mi.setAttribute("value", menuArray[i][1])
+		mi.addEventListener("command", EJS_commitContextMenu, true)
 		EJS_pupCodeCompletion.appendChild(mi)
-	}else{
-		//2 dim: label, value
-		var menuArray = new Array()
-		var i = 0;
-		for(prop in evalObj) {
-			if(attrPrefix.length!=0 && prop.indexOf(attrPrefix)!=0){
-				continue;
-			}
-			var miLabel = prop
-			try{
-				if(typeof evalObj[prop] == "function"){
-					miLabel += "()"
-				}
-			}catch(e){
-				//on props error occurs on typeof operator!!
-			}
-			var miValue = miLabel				
-			if(attrPrefix.length>0){
-				//Shorten for later pasting into textbox
-				miValue = miLabel.substring(attrPrefix.length)
-			}
-			menuArray[i] = [miLabel, miValue]
-			i++
-		}
-		menuArray.sort()
-		for(var i=0; i<menuArray.length; i++) {
-			var mi = document.createElement("menuitem")
-			mi.setAttribute("label", menuArray[i][0])
-			mi.setAttribute("value", menuArray[i][1])
-			mi.addEventListener("command", EJS_commitContextMenu, true)
-			EJS_pupCodeCompletion.appendChild(mi)
-		}
-		if(EJS_pupCodeCompletion.childNodes.length==0){
-			var mi = document.createElement("menuitem")
-			mi.setAttribute("label", "Nothing found")
-			EJS_pupCodeCompletion.appendChild(mi)
-		}
+	}
+	if(EJS_pupCodeCompletion.childNodes.length==0){
+		var mi = document.createElement("menuitem")
+		mi.setAttribute("label", "Nothing found")
+		EJS_pupCodeCompletion.appendChild(mi)
 	}
 	var bo = EJS_cntJsCode.boxObject;
 	EJS_pupCodeCompletion.showPopup(EJS_cntJsCode,bo.screenX+bo.width,bo.screenY, "popup")
