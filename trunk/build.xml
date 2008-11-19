@@ -13,9 +13,5 @@
         <fileset dir="${dist_dir}" includes="*"/>
     </delete>
     <zip destfile="./dist/${ant.project.name}_${version}.xpi" update="true" basedir="${src_dir}" includes="**"/>
-    <!-- Make backup-copy -->
-    <copy todir="${backup_dir}/src">
-		<fileset dir="${src_dir}"/>
-    </copy>
 </target>
 </project>
