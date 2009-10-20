@@ -1,0 +1,2 @@
+content executejs chrome/content/
+overlay	chrome://browser/content/browser.xul	chrome://executejs/content/executejs/executeJSOverlay.xul
