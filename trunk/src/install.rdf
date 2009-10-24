@@ -1,20 +1,33 @@
 <?xml version="1.0"?>
-<RDF:RDF xmlns:em="http://www.mozilla.org/2004/em-rdf#"
-         xmlns:NC="http://home.netscape.com/NC-rdf#"
-         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-  <RDF:Description RDF:about="urn:mozilla:install-manifest"
-                   em:id="{7067a92c-1db4-4e5e-869c-25f841287f8b}"
-                   em:name="Execute JS"
-                   em:version="0.2.2.1"
-                   em:creator="Rudolf Noe"
-                   em:description="Excute JS"
-                   em:homepageURL="http://www.mouseless.de/index.php?/content/view/18/31/"
-                   em:optionsURL="chrome://executejs/content/executejs/prefs.xul"
-                   em:aboutURL="chrome://executejs/content/executejs/about.xul">
-    <em:targetApplication RDF:resource="rdf:#$k1opS2"/>
-  </RDF:Description>
-  <RDF:Description RDF:about="rdf:#$k1opS2"
-                   em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
-                   em:minVersion="1.5"
-                   em:maxVersion="3.0.*" />
+
+<RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.mozilla.org/2004/em-rdf#">
+    <RDF:Description about="urn:mozilla:install-manifest">
+        <id>{7067a92c-1db4-4e5e-869c-25f841287f8b}</id>
+        
+        <name>Execute JS</name>
+        <version>0.2.3</version>
+        
+        <type>2</type><!-- extension -->
+        
+        <description>Excute JS</description>
+        <homepageURL>http://www.mouseless.de/index.php?/content/view/18/31/</homepageURL>
+        <creator>Rudolf Noe</creator>
+        
+        <targetApplication><!-- Firefox -->
+            <RDF:Description>
+                <id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</id>
+                <minVersion>1.5</minVersion>
+                <maxVersion>3.6a1pre</maxVersion> <!-- don't take my word for it! -->
+            </RDF:Description>
+        </targetApplication>
+
+        <targetApplication><!-- Thunderbird -->
+            <RDF:Description>
+                <id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</id>
+                <minVersion>1.5</minVersion>
+                <maxVersion>3.1a1pre</maxVersion> <!-- don't take my word for it! -->
+            </RDF:Description>
+        </targetApplication>
+        
+    </RDF:Description>
 </RDF:RDF>
