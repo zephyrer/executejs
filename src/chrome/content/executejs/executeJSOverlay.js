@@ -17,31 +17,36 @@
  * the  License  for  the   specific  language  governing  rights  and
  * limitations under the License.
  */
- 
-EJS_userPrefShortCutOpenCommandWin = "executejs.keys.openCommandWin";
+(function(){
+   var NS = rno_common.Namespace
 
-//Add event for each window
-window.addEventListener('load',  EJS_onInit, false);
-
-/*
-    Initilization for window
-*/
-function EJS_onInit() {
-    //Add preferences-observer
-    EJS_prefObserver = rno_common.Utils.createObserver(EJS_init);
-    rno_common.Utils.registerObserver(executejs.EjsCommon.EJS_PREF_OBSERVER, EJS_prefObserver);
-	EJS_combinedShortCutCode = rno_common.Prefs.getCharPref(EJS_userPrefShortCutOpenCommandWin);
-    EJS_init();
-}
-
-function EJS_openCommandWin(){
-    var win = window.open("chrome://executejs/content/executejs/executeJS.xul","commandwin", "chrome,width=850,height=450,resizable");
-    win.focus()    
-}
-
-function EJS_init(){
-	    ShortCutManager.clearAllShortCutsForClientId("EJS");
-    	EJS_combinedShortCutCode = rno_common.Prefs.getCharPref(EJS_userPrefShortCutOpenCommandWin);
-    	if(EJS_combinedShortCutCode)
-	    	ShortCutManager.addJsShortCutWithCombinedKeyCode(EJS_combinedShortCutCode, "EJS_openCommandWin()", "EJS");    
-}
+   var EJS_userPrefShortCutOpenCommandWin = "executejs.keys.openCommandWin";
+   
+   //Add event for each window
+   window.addEventListener('load',  EJS_onInit, false);
+   
+   /*
+       Initilization for window
+   */
+   function EJS_onInit() {
+       //Add preferences-observer
+       EJS_prefObserver = rno_common.Utils.createObserver(EJS_init);
+       rno_common.Utils.registerObserver(executejs.EjsCommon.EJS_PREF_OBSERVER, EJS_prefObserver);
+   	EJS_combinedShortCutCode = rno_common.Prefs.getCharPref(EJS_userPrefShortCutOpenCommandWin);
+       EJS_init();
+   }
+   
+   function EJS_openCommandWin(){
+       var win = window.open("chrome://executejs/content/executejs/executeJS.xul","commandwin", "chrome,width=850,height=450,resizable");
+       win.focus()    
+   }
+   NS.bindToNamespace("executejs", "EJS_openCommandWin", EJS_openCommandWin)
+   
+   function EJS_init(){
+   	    rno_common.ShortCutManager.clearAllShortCutsForClientId("EJS");
+       	EJS_combinedShortCutCode = rno_common.Prefs.getCharPref(EJS_userPrefShortCutOpenCommandWin);
+       	if(EJS_combinedShortCutCode)
+   	    	rno_common.ShortCutManager.addJsShortCutWithCombinedKeyCode(EJS_combinedShortCutCode, "executejs.EJS_openCommandWin()", "EJS");    
+   }
+   
+})()

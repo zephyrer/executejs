@@ -5,10 +5,9 @@
         <id>{7067a92c-1db4-4e5e-869c-25f841287f8b}</id>
         
         <name>Execute JS</name>
-        <version>0.2.3</version>
+        <version>0.2.4</version>
         
         <type>2</type><!-- extension -->
-        
         <description>Excute JS</description>
         <homepageURL>http://www.mouseless.de/index.php?/content/view/18/31/</homepageURL>
         <creator>Rudolf Noe</creator>
@@ -17,7 +16,7 @@
             <RDF:Description>
                 <id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</id>
                 <minVersion>1.5</minVersion>
-                <maxVersion>3.6.*</maxVersion>
+                <maxVersion>4.0b6</maxVersion>
             </RDF:Description>
         </targetApplication>
 

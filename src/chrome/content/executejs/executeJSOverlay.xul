@@ -15,9 +15,9 @@
         src="chrome://executejs/content/executejs/shortcutmanager_firefox.js">
     </script>
 	<menupopup id="menu_ToolsPopup">
-		<menuitem id="EJS_menuitem" oncommand="EJS_openCommandWin();" insertbefore="sanitizeSeparator" label="Open Execute JS" accesskey="o"/>
+		<menuitem id="EJS_menuitem" oncommand="executejs.EJS_openCommandWin();" insertbefore="sanitizeSeparator" label="Open Execute JS" accesskey="o"/>
 	</menupopup>
 	<menupopup id="toolsPopup">
-		<menuitem id="EJS_menuitem" oncommand="EJS_openCommandWin();" insertbefore="sanitizeSeparator" label="Open Execute JS" accesskey="o"/>
+		<menuitem id="EJS_menuitem" oncommand="executejs.EJS_openCommandWin();" insertbefore="sanitizeSeparator" label="Open Execute JS" accesskey="o"/>
 	</menupopup>
 </overlay>

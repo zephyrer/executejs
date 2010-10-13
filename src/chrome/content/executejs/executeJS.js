@@ -54,12 +54,14 @@ function EJS_doOnload(){
 }
 
 function EJS_initShortCuts(){
-	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_RETURN, ShortCutManager.CTRL, "EJS_executeJS()");
-	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_DOWN, ShortCutManager.CTRL, "EJS_nextCommandFromHistory()");
-	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_UP, ShortCutManager.CTRL, "EJS_previousCommandFromHistory()");
-	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_SPACE, ShortCutManager.CTRL_SHIFT, "EJS_commandAbbreviations()");
-	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_SPACE, ShortCutManager.CTRL, "EJS_codeCompletion()");
-	ShortCutManager.addJsShortCutForElement("functionName", 13, ShortCutManager.NONE, "EJS_searchFunctions()");
+	with(rno_common){
+      ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_RETURN, ShortCutManager.CTRL, "EJS_executeJS()");
+   	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_DOWN, ShortCutManager.CTRL, "EJS_nextCommandFromHistory()");
+   	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_UP, ShortCutManager.CTRL, "EJS_previousCommandFromHistory()");
+   	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_SPACE, ShortCutManager.CTRL_SHIFT, "EJS_commandAbbreviations()");
+   	ShortCutManager.addJsShortCutForElement("jsCode", KeyboardEvent.DOM_VK_SPACE, ShortCutManager.CTRL, "EJS_codeCompletion()");
+   	ShortCutManager.addJsShortCutForElement("functionName", 13, ShortCutManager.NONE, "EJS_searchFunctions()");
+   }
 }
 
 function EJS_initGlobVars(){
@@ -194,6 +196,8 @@ function EJS_evalStringOnTarget(string){
       sb.window = win
       return Components.utils.evalInSandbox("with(window){" + evalString + "}", sb)
 	}else{
+      EJS_currentTargetWin.EJS_appendToConsole = EJS_appendToConsole
+      EJS_currentTargetWin.EJS_printPropertiesForTarget = EJS_printPropertiesForTarget
       return EJS_currentTargetWin.eval(evalString)
 	}	
 }
@@ -364,6 +368,7 @@ function EJS_codeCompletion(){
 	}else{
 		var attrPrefix = evalString
 	}
+   attrPrefix = attrPrefix.toLowerCase();
 	var error = false
 	if(objString==""){
 		var evalObj = EJS_currentTargetWin
@@ -379,7 +384,7 @@ function EJS_codeCompletion(){
 	var menuArray = new Array()
 	var i = 0;
 	for(prop in evalObj) {
-		if(attrPrefix.length!=0 && prop.indexOf(attrPrefix)!=0){
+		if(attrPrefix.length!=0 && prop.toLowerCase().indexOf(attrPrefix)!=0){
 			continue;
 		}
 		var miLabel = prop
