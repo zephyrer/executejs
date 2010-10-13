@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.mozilla.org/2004/em-rdf#">
+    <RDF:Description about="urn:mozilla:install-manifest">
+        <id>{7067a92c-1db4-4e5e-869c-25f841287f8b}</id>
+        
+        <name>Execute JS</name>
+        <version>0.2.4</version>
+        
+        <type>2</type><!-- extension -->
+        <description>Excute JS</description>
+        <homepageURL>http://www.mouseless.de/index.php?/content/view/18/31/</homepageURL>
+        <creator>Rudolf Noe</creator>
+        
+        <targetApplication><!-- Firefox -->
+            <RDF:Description>
+                <id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</id>
+                <minVersion>1.5</minVersion>
+                <maxVersion>4.0b6</maxVersion>
+            </RDF:Description>
+        </targetApplication>
+
+        <targetApplication><!-- Thunderbird -->
+            <RDF:Description>
+                <id>{3550f703-e582-4d05-9a08-453d09bdfdc6}</id>
+                <minVersion>1.5</minVersion>
+                <maxVersion>3.1a1pre</maxVersion> <!-- don't take my word for it! -->
+            </RDF:Description>
+        </targetApplication>
+        
+    </RDF:Description>
+</RDF:RDF>
