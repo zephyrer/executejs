@@ -40,9 +40,12 @@
 		   return false;
 		},
 		
-		getInstallLocation: function(chromeUrl){
-			var extManager = this.getService("@mozilla.org/extensions/manager;1", "nsIExtensionManager");
-			return extManager.getInstallLocation(chromeUrl).location
+		getInstallLocation: function(){
+         var dir = Components.classes['@mozilla.org/file/directory_service;1']
+                        .createInstance(Components.interfaces.nsIProperties)
+                        .get('ProfD', Components.interfaces.nsIFile)
+        dir.append("extensions")
+        return dir
 		},
 		
 		/*
